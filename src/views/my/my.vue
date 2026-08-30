@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import useUserStore from '../../store/user.ts'
 import { NAvatar,NDivider } from 'naive-ui'
-
 const userStore = useUserStore()
 
 </script>
@@ -43,7 +42,6 @@ const userStore = useUserStore()
       </div>
 
       <n-divider style="margin-top: -16px;"/>
-
       <router-view></router-view>
     </div>
 </template>

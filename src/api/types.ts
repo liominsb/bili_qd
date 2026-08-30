@@ -17,3 +17,18 @@ export interface psw {
     old_password:string
     new_password:string
 }
+
+export interface VideoItem {
+    id: number
+    title: string
+    pic: string
+    created_at: string
+    author_id : number
+    video_url: string
+}
+
+export interface VideoInput {
+    title: string
+    pic: string
+    video_url: string
+}

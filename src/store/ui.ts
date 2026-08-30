@@ -15,3 +15,5 @@ export const useUiStore = defineStore('ui', () => {
 
     return { loginVisible, openLogin, closeLogin }
 })
+
+export default useUiStore

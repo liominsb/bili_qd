@@ -1,23 +1,25 @@
 import request from '../utils/request'
-import type { ApiResponse } from './types'
+import type {VideoItem,VideoInput} from './types'
 
 
-// 1. 单个视频条目（仅保留所需字段）
-export interface VideoItem {
-    bvid: string
-    title: string
-    pic: string
-    pubdate: number
-    owner: {
-        name: string
-    }
-    uri: string
+export async function getVideos(offset: number, limit: number): Promise<VideoItem[]> {
+    const res = await request.get<any,{ videos: VideoItem[] }>('/api/v1/videos', { params: { offset: offset || 0, limit: limit || 20 } })
+    return res.videos
 }
 
-// 2. 响应数据容器
-export interface VideoFeedData {
-    item: VideoItem[]
+export async function getVideoById(id: string): Promise<VideoItem> {
+    const res = await request.get<any, { video: VideoItem }>(`/api/v1/videos/${id}`)
+    return res.video
 }
-export function getVideoFeed(): Promise<ApiResponse<VideoFeedData>> {
-    return request.get<any,ApiResponse<VideoFeedData>>('/api/v1/videos/feed')
+
+export async function addNewVideo(VideoInput: VideoInput) {
+    return await request.post<any,{message:string}>('/api/v1/videos', VideoInput)
+}
+
+export async function updateVideo(VideoInput: VideoInput,id: string){
+    return await request.put<any,{message:string}>(`/api/v1/videos/${id}`, VideoInput)
+}
+
+export async function deleteVideo(id: string) {
+    return await request.delete<any,{message:string}>(`/api/v1/videos/${id}`)
 }

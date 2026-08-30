@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { useUiStore } from '../../store/ui'
+import useUiStore from '../../store/ui'
 import { NInput, NButton, NForm, NFormItem, NConfigProvider } from 'naive-ui'
 const ui = useUiStore()
 import useUserStore from '../../store/user'

@@ -9,7 +9,9 @@ import LoginModal from './components/auth/Login.vue'
       <headerBil />
     </div>
     <LoginModal/>
-    <router-view></router-view>
+    <n-message-provider>
+      <router-view></router-view>
+    </n-message-provider>
   </div>
 </template>
 

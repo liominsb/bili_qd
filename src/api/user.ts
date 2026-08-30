@@ -27,8 +27,8 @@ export const refreshTokenFuncApi = (data: { access_token:string,refresh_token: s
 export const getMyUser = () =>
     request.get<any, UserRes>('/api/v1/users/me')
 
-export const getUserProfileById = (id:string) =>
-    request.get(`/api/v1/users/${id}`)
+export const getUserProfileById = (id:number) =>
+    request.get<any,UserRes>(`/api/v1/users/${id}`)
 
 export const updateMyUser = (data: User) =>
     request.put<User, UserRes>('/api/v1/users/me', data)

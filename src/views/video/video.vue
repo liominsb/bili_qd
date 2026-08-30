@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { getVideoById } from '../../api/video.ts'
+import {computed, onMounted, ref} from "vue";
+import type {VideoItem} from '../../api/types.ts'
 const route = useRoute()
 defineProps(['id'])
-const videoSrc = `http://127.0.0.1:3000/api/v1/videos/${route.params.id}`
+const video = ref<VideoItem | null>(null)
+onMounted(async () => {
+  video.value=(await getVideoById(route.params.id as string))
+})
+
+const src = computed(() => video.value?.video_url ?? '')
+
 </script>
 
 <template>
-  <div class="video">
-    <h1 class="video-title">Video: {{ id }}</h1>
+  <div class="video" v-if="video">
+    <h1 class="video-title">Video: {{video.title}}</h1>
     <div class="video-wrapper">
-      <video :src="videoSrc" controls></video>
+      <video :src="src" controls></video>
     </div>
-
   </div>
 </template>
 

@@ -29,8 +29,8 @@ onUnmounted(() => {
 
 const options = [
   {
-    label: '用户资料',
-    key: 'profile',
+    label: '发布视频',
+    key: 'video',
     icon: () => h('i', { class: 'iconfont icon-gerenzhongxin' })
   },
   {
@@ -48,6 +48,8 @@ function handleDropdownSelect (key:string) {
   if (key === 'profile') {
     ui.openLogin()
     router.push('/my')
+  } else if (key === 'video') {
+    return router.push('/upload')
   } else if (key === 'editProfile') {
     router.push('/my/edit')
   } else if (key === 'logout') {
