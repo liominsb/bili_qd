@@ -25,10 +25,30 @@ export interface VideoItem {
     created_at: string
     author_id : number
     video_url: string
+    like_count : number
+    author_name: string
+    author_image: string
 }
 
 export interface VideoInput {
     title: string
     pic: string
     video_url: string
+}
+
+export interface CommentItem {
+    id: number
+    video_id: number
+    author_id: number
+    parent_id: number | null
+    content: string
+    created_at: string
+    like_count: number
+    author_name: string
+    author_image: string
+}
+
+export interface CommentInput {
+    content: string
+    parent_id: number | null
 }

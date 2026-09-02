@@ -11,7 +11,3 @@ export async function uploadFile(file: File) {
 
     return request.post<any,{url:string}>('/upload', formData)
 }
-
-export async function getFile(url: string) {
-    return request.get<string,any>(url)
-}

@@ -6,7 +6,6 @@ import {onMounted, ref} from "vue";
 import {formatPubdate} from "../utils/format.ts";
 
 const videos = ref<VideoItem[]>([])
-const loading = ref(true)
 const authorName =ref<Map<number, string>>(new Map())
 // 2. 在组件挂载时异步请求
 onMounted(async () => {
@@ -20,8 +19,6 @@ onMounted(async () => {
   }
    catch (error) {
     console.error('获取推荐视频失败:', error)
-  } finally {
-    loading.value = false
   }
 })
 </script>

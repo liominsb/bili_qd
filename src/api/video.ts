@@ -23,3 +23,12 @@ export async function updateVideo(VideoInput: VideoInput,id: string){
 export async function deleteVideo(id: string) {
     return await request.delete<any,{message:string}>(`/api/v1/videos/${id}`)
 }
+
+export async function  searchVideoByTitle(title: string,offset?:number,limit?:number) {
+    const res =await request.get<any,{ videos: VideoItem[] }>('/api/v1/videos/search', {params: {title: title,offset:offset,limit:limit}})
+    return res.videos
+}
+
+export async function updateVideoLike(videoId:number) {
+    return await request.put<any,{ok:boolean}>(`/api/v1/videos/${videoId}/like`)
+}
