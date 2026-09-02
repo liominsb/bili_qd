@@ -28,6 +28,7 @@ export interface VideoItem {
     like_count : number
     author_name: string
     author_image: string
+    author_bio: string
 }
 
 export interface VideoInput {

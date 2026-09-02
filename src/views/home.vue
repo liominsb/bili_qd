@@ -1,21 +1,14 @@
 <script setup lang="ts">
 import {getVideos} from "../api/video.ts";
-import {getUserProfileById} from "../api/user.ts"
 import type {VideoItem} from "../api/types.ts";
 import {onMounted, ref} from "vue";
 import {formatPubdate} from "../utils/format.ts";
 
 const videos = ref<VideoItem[]>([])
-const authorName =ref<Map<number, string>>(new Map())
 // 2. 在组件挂载时异步请求
 onMounted(async () => {
   try {
     videos.value = await getVideos(0, 20)
-    for  (const video of videos.value) {
-      getUserProfileById(video.author_id).then(function (res) {
-        authorName.value?.set(video.author_id, res.user.username)
-      })
-    }
   }
    catch (error) {
     console.error('获取推荐视频失败:', error)
@@ -31,7 +24,7 @@ onMounted(async () => {
         <img :src="video.pic" :alt="video.title"/>
         <h4>{{ video.title }}</h4>
         <div class="meta">
-          <h5>{{ authorName.get(video.author_id) }}</h5>
+          <h5>{{ video.author_name }}</h5>
           <h5>· {{ formatPubdate(Math.floor(new Date(video.created_at).getTime() / 1000)) }}</h5>
         </div>
       </router-link>

@@ -47,50 +47,61 @@ async function handleSubmit() {
 
 <template>
   <div class="video" v-if="video">
-    <h1 class="video-title">{{video.title}}</h1>
-    <div class="video-wrapper">
-      <video :src="src" controls></video>
-    </div>
-    <div class="video-data">
-      <i class="iconfont icon-dianzan" :class="{ 'liked': ok }" @click="updateVL(video.id)"></i>
-      <span>{{video.like_count}}</span>
-    </div>
-    <n-divider />
-    <div class="video-text">
-      <h1>
-        评论
-        <span>最热</span>
-        <span>|</span>
-        <span>最新</span>
-      </h1>
-      <n-button type="info" @click="handleSubmit">
-        发布
-      </n-button>
-    </div>
-    <n-space vertical>
-      <n-input
-          v-model:value="value"
-          type="textarea"
-          placeholder="千山万水总是情，写个评论行不行"
-          size="medium"
-      />
-    </n-space>
-    <div class="comment" v-for="comment in comments" :key="comment.id">
-      <n-flex vertical>
-        <div class="comment-Authorinfo">
-          <n-avatar
-              round
+      <div class="main">
+        <div class="video-title">{{video.title}}</div>
+        <div class="video-wrapper">
+          <video :src="src" controls></video>
+        </div>
+        <div class="video-data">
+          <i class="iconfont icon-dianzan" :class="{ 'liked': ok }" @click="updateVL(video.id)"></i>
+          <span>{{video.like_count}}</span>
+        </div>
+        <n-divider />
+        <div class="video-text">
+          <h1>
+            评论
+            <span>最热</span>
+            <span>|</span>
+            <span>最新</span>
+          </h1>
+          <n-button type="info" @click="handleSubmit">
+            发布
+          </n-button>
+        </div>
+        <n-space vertical>
+          <n-input
+              v-model:value="value"
+              type="textarea"
+              placeholder="千山万水总是情，写个评论行不行"
               size="medium"
-              :src="comment.author_image"
           />
-          <span>{{ comment.author_name }}</span>
+        </n-space>
+        <div class="comment" v-for="comment in comments" :key="comment.id">
+          <n-flex vertical>
+            <div class="comment-Authorinfo">
+              <n-avatar
+                  round
+                  size="medium"
+                  :src="comment.author_image"
+              />
+              <span>{{ comment.author_name }}</span>
+            </div>
+            <div class="comment-content">
+              <span>{{ comment.content }}</span>
+            </div>
+            <div class="comment-Date">{{ formatPubdate(Math.floor(new Date(comment.created_at).getTime() / 1000)) }}</div>
+          </n-flex>
+          <n-divider />
         </div>
-        <div class="comment-content">
-          <span>{{ comment.content }}</span>
-        </div>
-        <div class="comment-Date">{{ formatPubdate(Math.floor(new Date(comment.created_at).getTime() / 1000)) }}</div>
-      </n-flex>
-      <n-divider />
+    </div>
+    <div class="aside">
+      <n-avatar
+          round
+          :size=48
+          :src="video.author_image"
+      />
+      <span>{{ video.author_name }}</span>
+      <span>{{ video.author_bio }}</span>
     </div>
   </div>
 </template>
@@ -100,13 +111,31 @@ async function handleSubmit() {
 .video {
   --size:60px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;;
   justify-content: center;
+  gap: 20px;
   min-height: 100vh;
   margin: 0;
-  padding: 60px;
+  padding: 0 60px;
   box-sizing: border-box;
+}
+
+.main {
+  width: calc(var(--size) * 16);   /* 视频原来多宽，左栏就多宽 */
+  flex-shrink: 0;                  /* 禁止被压缩 */
+}
+
+.aside {
+  flex: 1;                  /* 占据剩余全部宽度 */
+  min-width: 300px;         /* 太窄的话给个下限 */
+}
+
+.video-title {
+  display: flex;
+  padding: 10px;
+  font-family: "PingFang SC", "Microsoft YaHei", "PingFang SC Round", sans-serif;
+  font-size: 30px;
 }
 
 /* 视频固定宽高（16:9 示例），并居中 */
@@ -140,6 +169,7 @@ video {
   gap: 8px; /* span之间的间距 */
   font-size: 20px; /* 调整大小 */
   margin: 0; /* 去掉默认外边距 */
+  font-family: "PingFang SC", "Microsoft YaHei", "PingFang SC Round", sans-serif;
 }
 
 .video-text span {

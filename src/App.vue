@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import headerBil from './components/header.vue'
 import LoginModal from './components/auth/Login.vue'
+import useUserStore from './store/user'
+
+const userStore = useUserStore()
+if (userStore.token) {
+  userStore.fetchMe().catch(() => userStore.logout())
+}
 </script>
 
 <template>
