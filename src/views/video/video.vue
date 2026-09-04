@@ -2,9 +2,13 @@
 import { useRoute } from 'vue-router'
 import { getVideoById,updateVideoLike } from '../../api/video.ts'
 import {getCommentsByVideoId,addNewComments} from '../../api/comment.ts'
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
 import type {VideoItem,CommentItem} from '../../api/types.ts'
 import {formatPubdate} from "../../utils/format.ts";
+import {useUiStore} from "../../store/ui.ts";
+import dayjs from 'dayjs'
+
+const ui = useUiStore()
 const route = useRoute()
 defineProps(['id'])
 const video = ref<VideoItem | null>(null)
@@ -12,6 +16,10 @@ const comments = ref<CommentItem[]>([])
 onMounted(async () => {
   video.value=(await getVideoById(route.params.id as string))
   comments.value=(await getCommentsByVideoId(video.value?.id as number))
+  ui.collapseBanner()
+})
+onUnmounted(() => {
+  ui.expandBanner()
 })
 // ok = true 表示当前已赞
 const ok = ref<boolean>(false)
@@ -48,7 +56,10 @@ async function handleSubmit() {
 <template>
   <div class="video" v-if="video">
       <div class="main">
-        <div class="video-title">{{video.title}}</div>
+        <div class="video-title">
+          <span class="title-text">{{ video.title }}</span>
+          <span class="date-text">{{ dayjs(video.created_at).format('YYYY-MM-DD HH:mm:ss') }}</span>
+        </div>
         <div class="video-wrapper">
           <video :src="src" controls></video>
         </div>
@@ -95,21 +106,25 @@ async function handleSubmit() {
         </div>
     </div>
     <div class="aside">
+      <div class="author-wrap">
       <n-avatar
           round
           :size=48
           :src="video.author_image"
       />
-      <span>{{ video.author_name }}</span>
-      <span>{{ video.author_bio }}</span>
+      <div class="author-info">
+        <span class="author-name">{{ video.author_name }}</span>
+        <span class="author-bio">{{ video.author_bio }}</span>
+      </div>
     </div>
+  </div>
   </div>
 </template>
 
 <style scoped>
 /* 让整个容器水平垂直居中，占满视口高度 */
 .video {
-  --size:60px;
+  --size:80px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;;
@@ -117,7 +132,7 @@ async function handleSubmit() {
   gap: 20px;
   min-height: 100vh;
   margin: 0;
-  padding: 0 60px;
+  padding: 0 200px;
   box-sizing: border-box;
 }
 
@@ -133,9 +148,19 @@ async function handleSubmit() {
 
 .video-title {
   display: flex;
+  flex-direction: column;  /* 改为纵向排列 */
   padding: 10px;
   font-family: "PingFang SC", "Microsoft YaHei", "PingFang SC Round", sans-serif;
-  font-size: 30px;
+  height: 80px;
+}
+
+.video-title .title-text {
+  font-size: 24px;
+}
+
+.video-title .date-text {
+  font-size: 13px;
+  color: #999;
 }
 
 /* 视频固定宽高（16:9 示例），并居中 */
@@ -217,5 +242,27 @@ video {
   font-size: 13px;
   color: #999;                              /* 灰色 */
   font-family: "PingFang SC", "Microsoft YaHei", "PingFang SC Round", sans-serif;  /* 圆润 */
+}
+
+.author-wrap {
+  display: flex;
+  align-items: center;   /* 头像和文本垂直居中对齐 */
+  gap: 12px;             /* 头像与文字间距 */
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column; /* 竖排 */
+  gap: 4px;
+}
+
+.author-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.author-bio {
+  font-size: 13px;
+  color: #999;
 }
 </style>

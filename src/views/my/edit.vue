@@ -4,7 +4,8 @@ import { ref } from 'vue'
 import useUserStore from '../../store/user.ts'
 import type {psw, User} from "../../api/types.ts";
 
-const formRef = ref<FormInst | null>(null)
+const profileFormRef = ref<FormInst | null>(null)
+const pswFormRef = ref<FormInst | null>(null)
 const userStore = useUserStore()
 
 const formValue = ref<User>({
@@ -37,13 +38,13 @@ const rules: FormRules = {
 }
 
 const formPswRules: FormRules = {
-  oldPassword: [
+  old_password: [
     { required: true, message: '请输入旧密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度需在 6 到 20 个字符之间', trigger: 'input' }
+    { min: 3, max: 20, message: '长度需在 3 到 20 个字符之间', trigger: 'input' }
   ],
-  newPassword: [
+  new_password: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度需在 6 到 20 个字符之间', trigger: 'input' }
+    { min: 3, max: 20, message: '长度需在 3 到 20 个字符之间', trigger: 'input' }
   ]
 }
 
@@ -52,7 +53,7 @@ function handleValidate() {
     alert('没有修改任何信息，取消提交')
     return
   }
-  formRef.value?.validate((errors) => {
+  profileFormRef.value?.validate((errors) => {
     if (!errors) {
       alert('验证通过，提交表单')
       userStore.updateMyUserinfo(formValue.value)
@@ -64,7 +65,7 @@ function handleValidate() {
 }
 
 function handleValidatePsw() {
-  formRef.value?.validate(async (errors) => {
+  pswFormRef.value?.validate(async (errors) => {
     if (!errors) {
       try {
         await userStore.updateMyPassword(formPsw.value)
@@ -85,7 +86,7 @@ function handleValidatePsw() {
 
 <template>
   <n-form
-      ref="formRef"
+      ref="profileFormRef"
       inline
       :label-width="80"
       :model="formValue"
@@ -108,7 +109,7 @@ function handleValidatePsw() {
   </n-form>
 
   <n-form
-      ref="formRef"
+      ref="pswFormRef"
       inline
       :label-width="80"
       :model="formPsw"

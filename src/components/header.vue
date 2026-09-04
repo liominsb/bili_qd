@@ -22,9 +22,11 @@ const handleScroll = () => {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   store.fetchMe()
+
 })
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+
 })
 
 const options = [
@@ -102,7 +104,7 @@ function handleDropdownSelect (key:string) {
       </div>
     </nav>
 
-    <div class="banner-box">
+    <div class="banner-box" :class="{ collapsed: ui.bannerCollapsed }">
       <img src="../../img/h2.avif" alt="Header Image" />
     </div>
   </div>
@@ -238,6 +240,12 @@ function handleDropdownSelect (key:string) {
 
 }
 
+/* 详情页压缩 banner：高度归零并裁掉溢出，横幅完全收起 */
+.banner-box.collapsed {
+  height: 80px;
+  overflow: hidden;
+}
+
 i{
   color: #23ADE5;
   font-size: 27px;
@@ -262,5 +270,10 @@ i{
   font-size: 18px;           /* 图标尺寸 */
   margin-bottom: 3px;        /* 图标与文字间距 */
   color: #e0e0e0;
+}
+
+.banner-box.collapsed img {
+  height: 60px;
+  object-fit: cover;
 }
 </style>

@@ -5,7 +5,6 @@ import {ref, watch} from 'vue'
 import {searchVideoByTitle} from '../api/video.ts'
 import type {VideoItem} from '../api/types.ts'
 import {formatPubdate} from "../utils/format.ts";
-import {getUserProfileById} from "../api/user.ts";
 
 const route = useRoute()
 const keyword = ref(route.query.q as string || '')
@@ -14,10 +13,6 @@ const authorName =ref<Map<number, string>>(new Map())
 async function fetchResults(title: string,offset?: number, limit?: number,) {
   // 调接口拿搜索结果
   results.value = await searchVideoByTitle(title,offset,limit)
-  for (const video of results.value) {
-    getUserProfileById(video.author_id).then(function (res) {
-      authorName.value?.set(video.author_id, res.user.username)})
-  }
 }
 watch(() => route.query.q, (newQ) => {
   keyword.value = newQ as string
@@ -32,7 +27,7 @@ watch(() => route.query.q, (newQ) => {
         <img :src="video.pic" :alt="video.title"/>
         <h4>{{ video.title }}</h4>
         <div class="meta">
-          <h5>{{ authorName.get(video.author_id) }}</h5>
+          <h5>{{ video.author_name }}</h5>
           <h5>· {{ formatPubdate(Math.floor(new Date(video.created_at).getTime() / 1000)) }}</h5>
         </div>
       </router-link>

@@ -4,7 +4,9 @@ import { NUpload, type UploadFileInfo, useMessage } from 'naive-ui'
 import { ref } from 'vue'
 import type {VideoInput} from '../api/types.ts'
 import {addNewVideo} from '../api/video.ts'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const message = useMessage()
 const title = ref<string>("")
 const MAX_IMG_SIZE = 5 * 1024 * 1024        // 封面 5MB
@@ -64,6 +66,18 @@ function handleFinish_video({ file, event }: { file: UploadFileInfo; event?: Pro
 }
 
 async function submit() {
+  if (!title.value.trim()) {
+    message.error('请先填写视频标题')
+    return
+  }
+  if (!uploadResults_video.value) {
+    message.error('请先上传视频文件')
+    return
+  }
+  if (!uploadResults_img.value) {
+    message.error('请先上传视频封面')
+    return
+  }
   const video :VideoInput = {
     title:title.value,
     pic:uploadResults_img.value,
@@ -71,6 +85,7 @@ async function submit() {
   }
   const r=await addNewVideo(video)
   alert(r.message)
+  router.push({ name: 'home' })
 }
 </script>
 
