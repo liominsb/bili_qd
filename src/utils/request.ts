@@ -7,6 +7,8 @@ const request = axios.create({
     timeout: 5000
 })
 
+let refreshingPromise: Promise<void> | null = null
+
 // 请求拦截器：带上 token
 request.interceptors.request.use((config) => {
     const token = localStorage.getItem('token')
@@ -29,9 +31,13 @@ request.interceptors.response.use(
 
         error.config._retry = true
         try {
-            const store = useUserStore()
-            await store.refreshTokenFunc()   // 换票 + 更新 store 和 localStorage
-            return request(error.config)     // 用新 token 重发原请求
+            if (!refreshingPromise) {
+                refreshingPromise = useUserStore().refreshTokenFunc().finally(function () {
+                    refreshingPromise = null
+                })
+            }
+            await refreshingPromise
+            return request(error.config)  // 刷新成功 → 重试原请求
         } catch {
             // 刷新也失败（refreshToken 过期/被踢）→ 清态跳登录
             localStorage.removeItem('token')

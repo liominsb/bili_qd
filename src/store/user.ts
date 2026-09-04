@@ -74,8 +74,8 @@ const useUserStore = defineStore('user', () => {
     }
 
     const refreshTokenFunc = async () => {
-        if (!refreshToken.value) return
-        const res = await refreshTokenFuncApi({ access_token: token.value, refresh_token: refreshToken.value })
+        if (!localStorage.getItem('refreshToken')) return
+        const res = await refreshTokenFuncApi({ access_token: localStorage.getItem('token')||'', refresh_token: localStorage.getItem('refreshToken')||'' })
         setToken(res.token, res.refreshToken)
     }
 
