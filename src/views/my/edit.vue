@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useMessage } from 'naive-ui'
 import type { FormInst, FormRules } from 'naive-ui'
 import { ref } from 'vue'
 import useUserStore from '../../store/user.ts'
@@ -7,6 +8,7 @@ import type {psw, User} from "../../api/types.ts";
 const profileFormRef = ref<FormInst | null>(null)
 const pswFormRef = ref<FormInst | null>(null)
 const userStore = useUserStore()
+const message = useMessage()
 
 const formValue = ref<User>({
   id: userStore.id,
@@ -50,16 +52,16 @@ const formPswRules: FormRules = {
 
 function handleValidate() {
   if (formValue.value.username==userStore.name&&formValue.value.bio==userStore.bio&&formValue.value.image==userStore.image) {
-    alert('没有修改任何信息，取消提交')
+    message.warning('没有修改任何信息，取消提交')
     return
   }
   profileFormRef.value?.validate((errors) => {
     if (!errors) {
-      alert('验证通过，提交表单')
+      message.success('验证通过，提交表单')
       userStore.updateMyUserinfo(formValue.value)
     }
     else {
-      alert(errors)
+      message.error('表单验证失败')
     }
   })
 }
@@ -69,15 +71,15 @@ function handleValidatePsw() {
     if (!errors) {
       try {
         await userStore.updateMyPassword(formPsw.value)
-        alert('修改密码成功，请重新登录')
+        message.success('修改密码成功，请重新登录')
         } catch (error:any) {
-        alert(error.message)
+        message.error(error.message)
         console.log(error.message)
       }
     }
     else {
       const msg = errors.flat().map(function (e) { return e.message }).join('\n')
-      alert(msg)
+      message.error(msg)
       return
     }
   })

@@ -42,6 +42,14 @@ const router=createRouter(
                     {
                         path:'News',
                         component: ()=> import('../views/my/news.vue')
+                    },
+                    {
+                        path:'following',
+                        component: ()=> import('../views/my/following.vue')
+                    },
+                    {
+                        path:'followers',
+                        component: ()=> import('../views/my/followers.vue')
                     }
                 ],
                 beforeEnter:() => {

@@ -6,9 +6,13 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 import type {VideoItem,CommentItem} from '../../api/types.ts'
 import {formatPubdate} from "../../utils/format.ts";
 import {useUiStore} from "../../store/ui.ts";
+import useUserStore from '../../store/user.ts'
+import { followUser, unfollowUser, getFollowStats } from '../../api/follow.ts'
 import dayjs from 'dayjs'
+import { useMessage } from 'naive-ui'
 
 const ui = useUiStore()
+const message = useMessage()
 const route = useRoute()
 defineProps(['id'])
 const video = ref<VideoItem | null>(null)
@@ -16,6 +20,7 @@ const comments = ref<CommentItem[]>([])
 onMounted(async () => {
   video.value=(await getVideoById(route.params.id as string))
   comments.value=(await getCommentsByVideoId(video.value?.id as number))
+  loadFollowState(video.value?.author_id as number)
   ui.collapseBanner()
 })
 onUnmounted(() => {
@@ -43,11 +48,42 @@ const value = ref<string>("")
 async function handleSubmit() {
   try {
     const res = await addNewComments({ content: value.value, parent_id: 0 }, video.value?.id as number)
-    alert(res.message)
+    message.success(res.message)
     value.value = ''
   } catch (err) {
     // err 就是拦截器抛出来的 Error，.message 是后端返回的错误信息
-    alert(err instanceof Error ? err.message : '发表失败')
+    message.error(err instanceof Error ? err.message : '发表失败')
+  }
+}
+
+const userStore = useUserStore()
+const isFollowing = ref(false)
+const followerCount = ref(0)
+
+async function loadFollowState(authorId: number) {
+  const stats = await getFollowStats(authorId)
+  isFollowing.value = stats.is_following
+  followerCount.value = stats.follower_count
+}
+
+async function toggleFollow(authorId: number) {
+  if (!userStore.isLogin) {
+    message.warning('请先登录')
+    return
+  }
+  try {
+    if (isFollowing.value) {
+      await unfollowUser(authorId)
+      followerCount.value--
+      isFollowing.value = false
+    } else {
+      await followUser(authorId)
+      followerCount.value++
+      isFollowing.value = true
+    }
+  } catch (err) {
+    // err 就是拦截器抛出的 Error，.message 是后端返回的错误信息
+    message.error(err instanceof Error ? err.message : '操作失败')
   }
 }
 
@@ -114,8 +150,15 @@ async function handleSubmit() {
       />
       <div class="author-info">
         <span class="author-name">{{ video.author_name }}</span>
-        <span class="author-bio">{{ video.author_bio }}</span>
+        <span class="author-bio">{{ video.author_bio }} · {{ followerCount }} 粉丝</span>
       </div>
+      <n-button
+          size="small"
+          :type="isFollowing ? 'default' : 'primary'"
+          @click="toggleFollow(video.author_id)"
+      >
+        {{ isFollowing ? '已关注' : '+ 关注' }}
+      </n-button>
     </div>
   </div>
   </div>
@@ -251,9 +294,11 @@ video {
 }
 
 .author-info {
+  padding: 10px;
   display: flex;
   flex-direction: column; /* 竖排 */
   gap: 4px;
+
 }
 
 .author-name {

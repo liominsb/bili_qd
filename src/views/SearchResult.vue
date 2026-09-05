@@ -9,7 +9,6 @@ import {formatPubdate} from "../utils/format.ts";
 const route = useRoute()
 const keyword = ref(route.query.q as string || '')
 const results = ref<VideoItem[]>([])
-const authorName =ref<Map<number, string>>(new Map())
 async function fetchResults(title: string,offset?: number, limit?: number,) {
   // 调接口拿搜索结果
   results.value = await searchVideoByTitle(title,offset,limit)

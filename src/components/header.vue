@@ -16,6 +16,10 @@ function handleSearch() {
   router.push({ name: 'Search', query: { q: input } })
 }
 
+function pushupload() {
+  router.push({ name: 'upload' })
+}
+
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 100
 }
@@ -31,11 +35,6 @@ onUnmounted(() => {
 
 const options = [
   {
-    label: '发布视频',
-    key: 'video',
-    icon: () => h('i', { class: 'iconfont icon-gerenzhongxin' })
-  },
-  {
     label: '编辑用户资料',
     key: 'editProfile',
     icon: () => h('i', { class: 'iconfont icon-edit' })
@@ -50,9 +49,7 @@ function handleDropdownSelect (key:string) {
   if (key === 'profile') {
     ui.openLogin()
     router.push('/my')
-  } else if (key === 'video') {
-    return router.push('/upload')
-  } else if (key === 'editProfile') {
+  }  else if (key === 'editProfile') {
     router.push('/my/edit')
   } else if (key === 'logout') {
     store.logout()
@@ -64,12 +61,8 @@ function handleDropdownSelect (key:string) {
   <div class="header-wrapper">
     <nav class="fixed-nav" :class="{ 'has-bg': isScrolled }">
       <div class="left">
-        <i class="iconfont icon-bilibili"></i>
+        <i class="iconfont icon-bilibili-line" style="color: #e0e0e0;font-size: 24px;padding: 0"></i>
         <router-link to="/">首页</router-link>
-        <a href="#" target="_self">番剧</a>
-        <a href="#" target="_self">电影</a>
-        <a href="#" target="_self">国创</a>
-        <a href="#" target="_self">电视剧</a>
       </div>
       <div class="search-box">
         <input type="text" placeholder="搜索关键词..." v-model="searchInput" @keydown.enter="handleSearch">
@@ -101,11 +94,16 @@ function handleDropdownSelect (key:string) {
           <i class="iconfont icon-zhongbiao"></i>
           <span>历史</span>
         </router-link>
+        <button @click="pushupload" style="cursor: pointer;color: #e0e0e0; background-color: #fb7299; border: none; height: 34px;width: 90px;border-radius: 6px;">
+          <i class="iconfont icon-tougaox" style="font-size: 16px; color: #e0e0e0"></i>
+          投稿
+        </button>
       </div>
     </nav>
 
     <div class="banner-box" :class="{ collapsed: ui.bannerCollapsed }">
-      <img src="../../img/h2.avif" alt="Header Image" />
+      <img class="banner-image" src="../../img/h2.avif" alt="Header Image" />
+      <img class="banner-logo" src="../../img/bilibili-logo.png" alt="" />
     </div>
   </div>
 </template>
@@ -139,15 +137,25 @@ function handleDropdownSelect (key:string) {
   box-sizing: border-box;
 }
 
+.left ,.right {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
 .left {
+
   font-size: 13px;
 }
 
-.left,
 .right {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.left .icon-bilibili-line {
+  margin-right: -6px;
 }
 
 .fixed-nav a {
@@ -163,9 +171,9 @@ function handleDropdownSelect (key:string) {
 .search-box {
   display: flex;
   align-items: center;
-  flex: 1;
-  max-width: 420px;
-  height: 32px;                  /* 适当增加一点高度，视觉比例更好 */
+  flex: 0 1 500px;
+  height: 40px;
+  max-width: 500px;
   margin: 0 20px;
   padding: 0 12px 0 12px;        /* 👈 修改右边距为 12px，两端对称 */
   border-radius: 8px;
@@ -233,17 +241,30 @@ function handleDropdownSelect (key:string) {
   height: auto;
 }
 
-.banner-box img {
+.banner-box .banner-image {
   width: 100%;
   display: block;
   object-fit: cover;
-
 }
+.banner-logo {
+  position: absolute;
+  left: 90px;
+  top: 80px;
+  bottom: 8px;
+  width: 170px;         /* 原图 220x105，等比缩放后约 81px 高 */
+  pointer-events: none; /* 不挡 banner 点击 */
+}
+
+.banner-box.collapsed .banner-logo {
+  display: none;
+}
+
 
 /* 详情页压缩 banner：高度归零并裁掉溢出，横幅完全收起 */
 .banner-box.collapsed {
   height: 80px;
   overflow: hidden;
+  position: relative;
 }
 
 i{

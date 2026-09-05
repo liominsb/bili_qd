@@ -18,6 +18,10 @@ onMounted(async () => {
 
 <template>
   <div class="home">
+    <div class="home-focus">
+        <img src="https://i0.hdslb.com/bfs/banner/130c14dd71d105ac187864740dc5d79df972040c.jpg@976w_550h_!web-home-carousel-cover.avif?mirror_report_swipe=1" alt="焦点图"/>
+    </div>
+
     <div class="video" v-for="video in videos" :key="video.id">
 <!--      <router-link :to="{ name: 'video', params: { id: video.id } }">-->
       <router-link :to="`/video/${video.id}`">
@@ -34,17 +38,29 @@ onMounted(async () => {
 
 <style scoped>
 .home {
-  display: flex;
-  flex-direction: row;
-  gap: 40px 20px;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 333px);  /* 列宽=卡片宽，容器能放几列放几列 */
+  gap: 20px;                                    /* 行距40 列距20，和原来一致 */
+  justify-content: center;                           /* 整个网格在容器内居中 */
   padding: 40px 140px;
 }
 
+.home-focus {
+  grid-column: span 2;   /* 横向占 2 列 → 333×2 + 20 = 686px */
+  grid-row: span 2;      /* 纵向占 2 行 → 262×2 + 20 = 544px */
+}
+
+.home-focus img {
+  width: 686px;
+  height: 470px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
 .video {
-  width: 264px;
-  height: 220px;
+  width: 333px;
+  height: 262px;
 }
 
 /* 2. 封面图与圆角 */
@@ -62,7 +78,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", HarmonyOS_Regular, "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  font-family: PingFang SC, HarmonyOS_Regular, Helvetica Neue, Microsoft YaHei, sans-serif !important;
   -webkit-font-smoothing: antialiased;
 }
 

@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import useUserStore from '../../store/user.ts'
 import { NAvatar,NDivider } from 'naive-ui'
+import { onMounted } from 'vue'
 const userStore = useUserStore()
 
+onMounted(async function () {
+    await userStore.fetchFollowStats()
+})
 </script>
 
 <template>
@@ -22,14 +26,14 @@ const userStore = useUserStore()
         </div>
 
         <div class="data-stat-wrap">
-          <div class="stat-item">
-            <div class="stat-num">{{ userStore.followNum || 325 }}</div>
+          <router-link to="/my/following" class="stat-item">
+            <div class="stat-num">{{ userStore.followNum }}</div>
             <div class="stat-label">关注数</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num">{{ userStore.fansNum || 44 }}</div>
+          </router-link>
+          <router-link to="/my/followers" class="stat-item">
+            <div class="stat-num">{{ userStore.fansNum }}</div>
             <div class="stat-label">粉丝数</div>
-          </div>
+          </router-link>
           <div class="stat-item">
             <div class="stat-num">{{ userStore.likeNum || 284 }}</div>
             <div class="stat-label">获赞数</div>
@@ -91,7 +95,7 @@ const userStore = useUserStore()
 
 /* 右侧数据统计：横向排列 */
 .data-stat-wrap { display: flex; align-items: center; gap: 28px; padding-right: 150px; }
-.stat-item { text-align: center; }
+.stat-item { text-align: center; text-decoration: none; color: inherit; cursor: pointer; }
 .stat-num { font-size: 18px; font-weight: 600; color: #18191c; }
 .stat-label { font-size: 12px; color: #9499a0; margin-top: 2px; }
 

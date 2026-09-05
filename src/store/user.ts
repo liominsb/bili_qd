@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import {login as loginApi, register as registerApi, getMyUser, updateMyUser, updatePsw, refreshTokenFuncApi} from '../api/user'
+import { getFollowStats } from '../api/follow'
 import type { User,psw } from '../api/types'
 
 const useUserStore = defineStore('user', () => {
@@ -12,6 +13,17 @@ const useUserStore = defineStore('user', () => {
     const name = ref('')
     const bio = ref('')
     const image = ref('')
+
+    const followNum = ref(0)
+    const fansNum = ref(0)
+
+    const fetchFollowStats = async function () {
+        if (!id.value) await fetchMe()   // 保底：没拉过资料先拉一次拿 id
+        if (!id.value) return
+        const stats = await getFollowStats(id.value)
+        followNum.value = stats.following_count
+        fansNum.value = stats.follower_count
+    }
 
     // 模板里直接 v-if="userStore.isLogin"
     const isLogin = computed(() => !!token.value)
@@ -61,6 +73,8 @@ const useUserStore = defineStore('user', () => {
         name.value = ''
         bio.value = ''
         image.value = ''
+        fansNum.value = 0
+        followNum.value = 0
     }
 
     const updateMyUserinfo = async (data: User) => {
@@ -79,7 +93,7 @@ const useUserStore = defineStore('user', () => {
         setToken(res.token, res.refreshToken)
     }
 
-    return { token, refreshToken, id, name, bio, image, isLogin, login, fetchMe, logout,register, updateMyUserinfo, updateMyPassword,refreshTokenFunc }
+    return { token, refreshToken, id, name, bio, image, followNum, fansNum, isLogin, login, fetchMe, logout,register, updateMyUserinfo, updateMyPassword,refreshTokenFunc, fetchFollowStats }
 })
 
 export default useUserStore

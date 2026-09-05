@@ -53,3 +53,16 @@ export interface CommentInput {
     content: string
     parent_id: number | null
 }
+
+export interface UserBrief {
+    id: number
+    username: string
+    image: string
+    bio: string
+}
+
+export interface FollowStats {
+    following_count: number
+    follower_count: number
+    is_following: boolean
+}

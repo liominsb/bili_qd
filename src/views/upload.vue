@@ -84,7 +84,7 @@ async function submit() {
     video_url:uploadResults_video.value,
   }
   const r=await addNewVideo(video)
-  alert(r.message)
+  message.success(r.message)
   router.push({ name: 'home' })
 }
 </script>
