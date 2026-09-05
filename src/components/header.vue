@@ -65,7 +65,7 @@ function handleDropdownSelect (key:string) {
         <router-link to="/">首页</router-link>
       </div>
       <div class="search-box">
-        <input type="text" placeholder="搜索关键词..." v-model="searchInput" @keydown.enter="handleSearch">
+        <n-input type="text" placeholder="搜索关键词" v-model:value="searchInput"  @keydown.enter="handleSearch" :bordered="false" clearable />
         <i class="iconfont icon-sousuo" @click="handleSearch"></i>
       </div>
       <div class="right">
@@ -175,7 +175,7 @@ function handleDropdownSelect (key:string) {
   height: 40px;
   max-width: 500px;
   margin: 0 20px;
-  padding: 0 12px 0 12px;        /* 👈 修改右边距为 12px，两端对称 */
+  padding: 0 12px 0 0;        /* 👈 修改右边距为 12px，两端对称 */
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(8px);
@@ -183,23 +183,36 @@ function handleDropdownSelect (key:string) {
   box-sizing: border-box;
   transition: all 0.3s ease;
 }
-.search-box input {
+
+.search-box :deep(.n-input) {
   flex: 1;
-  width: 100%;                   /* 👈 删除 fixed 411px，改为 100% 自动伸缩 */
   height: 100%;
   border: none;
-  outline: none;
-  background: transparent;
+  background-color: transparent;              /* 不聚焦：透明 */
+}
+
+.search-box:hover,.search-box :deep(.n-input):hover{
+  background-color: #ffffff;
+}
+
+.search-box:focus-within :deep(.n-input) {
+  background-color: #ebebeb;       /* 灰色 */
+  border-radius: 5px;              /* 圆角，灰块更柔和 */
+  margin: 3px 4px;                 /* 四周内缩：上下3px、左右4px */
+  height: calc(100% - 6px);        /* 高度扣掉上下 margin（3+3） */
+}
+
+.search-box:focus-within {
+  background-color: #ffffff;      /* 聚焦后整条变白 */
+}
+
+/* 内部真正的 input 文字 */
+.search-box :deep(.n-input__input-el) {
   font-size: 14px;
   color: #18191c;
   font-family: inherit;
 }
 
-.search-box input::placeholder {
-  color: #757575;
-  padding: 0 8px 0 0;
-  font-size: 12px;
-}
 .search-box .icon-sousuo {
   color: #18191c;
   cursor: pointer;
@@ -224,14 +237,7 @@ function handleDropdownSelect (key:string) {
   text-shadow: none;
 }
 
-.fixed-nav.has-bg .search-box input {
-  background-color: #f0f0f0;
-  border-color: transparent;
-}
 
-.fixed-nav.has-bg .search-box input::placeholder {
-  color: #999999;
-}
 .fixed-nav.has-bg .n-button {
   color: #333333;
 }
