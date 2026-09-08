@@ -42,7 +42,7 @@ const banners = [
           <img :src="video.pic" :alt="video.title"/>
           <div class="img-interface"></div>
           <i class="iconfont icon-shipin1" style="color: #ffffff;"></i>
-          <p class="cover-text">{{ video.id }}</p>
+          <p class="cover-text">{{ video.view_count }}</p>
           <p class="cover-time">{{ formatDuration(video.duration) }}</p>
         </div>
         <h4>{{ video.title }}</h4>

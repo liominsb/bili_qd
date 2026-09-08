@@ -94,7 +94,12 @@ async function toggleFollow(authorId: number) {
       <div class="main">
         <div class="video-title">
           <span class="title-text">{{ video.title }}</span>
-          <span class="date-text">{{ dayjs(video.created_at).format('YYYY-MM-DD HH:mm:ss') }}</span>
+          <div class="date-text">
+            <i class="iconfont icon-shipin1"></i>
+            <span class="cover-text" style="margin-left: -12px;">{{ video.view_count }}</span>
+            <span>{{ dayjs(video.created_at).format('YYYY-MM-DD HH:mm:ss') }}</span>
+          </div>
+
         </div>
         <div class="video-wrapper">
           <video :src="src" controls></video>
@@ -206,9 +211,12 @@ async function toggleFollow(authorId: number) {
 }
 
 .video-title .date-text {
+  display: flex;
   font-size: 13px;
   color: #999;
-  margin-top: auto
+  margin-top: auto;
+  gap: 12px;
+  align-items: center;
 }
 
 /* 视频固定宽高（16:9 示例），并居中 */

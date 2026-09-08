@@ -23,6 +23,7 @@ export interface VideoItem {
     author_image: string
     author_bio: string
     duration : number
+    view_count : number
 }
 
 export interface VideoInput {
