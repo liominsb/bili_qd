@@ -94,9 +94,9 @@ function handleDropdownSelect (key:string) {
           <i class="iconfont icon-zhongbiao"></i>
           <span>历史</span>
         </router-link>
-        <button @click="pushupload" style="cursor: pointer;color: #e0e0e0; background-color: #fb7299; border: none; height: 34px;width: 90px;border-radius: 6px;">
-          <i class="iconfont icon-tougaox" style="font-size: 16px; color: #e0e0e0"></i>
-          投稿
+        <button @click="pushupload" style="cursor: pointer;color: #ffffff; background-color: #fb7299; border: none; height: 34px;width: 90px;border-radius: 6px;">
+          <i class="iconfont icon-tougaox" style="font-size: 16px; color: #ffffff;padding: 0 6px 0 0"></i>
+          <span style="font-weight: 450">投稿</span>
         </button>
       </div>
     </nav>
@@ -189,7 +189,9 @@ function handleDropdownSelect (key:string) {
   height: 100%;
   border: none;
   background-color: transparent;              /* 不聚焦：透明 */
+  --n-placeholder-color: rgb(0 0 0 / 0.5) !important;
 }
+
 
 .search-box:hover,.search-box :deep(.n-input):hover{
   background-color: #ffffff;

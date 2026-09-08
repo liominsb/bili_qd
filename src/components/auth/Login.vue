@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import useUiStore from '../../store/ui'
-import { NInput, NButton, NForm, NFormItem, NConfigProvider } from 'naive-ui'
+import {NInput, NButton, NForm, NFormItem, NConfigProvider, useMessage} from 'naive-ui'
 const ui = useUiStore()
 import useUserStore from '../../store/user'
 const userStore = useUserStore()
+const message = useMessage()
 // 表单数据,双向绑定到下面的 input
 const form = reactive({ username: '', password: '' })
 
@@ -22,14 +23,24 @@ const close = () => ui.closeLogin()
 
 // 提交登录
 const handleLogin = async () => {
-  if (!form.username || !form.password) return
-  await userStore.login(form)
-  ui.closeLogin()
+  try {
+    if (!form.username || !form.password) return
+    await userStore.login(form)
+    ui.closeLogin()
+  }
+  catch (err) {
+    message.error(err instanceof Error ? err.message : '操作失败')
+  }
 }
 const handleRegister = async () => {
-  if (!form.username || !form.password) return
-  await userStore.register(form)
-  ui.closeLogin()
+  try {
+    if (!form.username || !form.password) return
+    await userStore.register(form)
+    ui.closeLogin()
+  }
+  catch (err) {
+    message.error(err instanceof Error ? err.message : '操作失败')
+  }
 }
 </script>
 

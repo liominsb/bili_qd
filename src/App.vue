@@ -27,9 +27,9 @@ const themeOverrides = {
       <div class="header-wrapper">
         <headerBil />
       </div>
-      <LoginModal/>
       <n-message-provider :closable="true">
         <router-view></router-view>
+        <LoginModal/>
       </n-message-provider>
     </n-config-provider>
   </div>

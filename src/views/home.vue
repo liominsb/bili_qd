@@ -14,18 +14,36 @@ onMounted(async () => {
     console.error('获取推荐视频失败:', error)
   }
 })
+
+const banners = [
+  { id: 1, pic: 'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel1.jpeg', title: '第一个轮播标题' },
+  { id: 2, pic: 'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel2.jpeg', title: '第二个轮播标题' },
+  { id: 3, pic: 'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel3.jpeg', title: '第三个轮播标题' },
+  { id: 4, pic: 'https://naive-ui.oss-cn-beijing.aliyuncs.com/carousel-img/carousel4.jpeg', title: '第四个轮播标题' },
+]
 </script>
 
 <template>
   <div class="home">
     <div class="home-focus">
-        <img src="https://i0.hdslb.com/bfs/banner/130c14dd71d105ac187864740dc5d79df972040c.jpg@976w_550h_!web-home-carousel-cover.avif?mirror_report_swipe=1" alt="焦点图"/>
+      <n-carousel show-arrow style="width: 686px;height: 470px;">
+        <div class="slide" v-for="banner in banners" :key="banner.id">
+          <img class="slide-img" :src="banner.pic">
+          <div class="slide-mask"></div>
+          <p class="slide-text">{{ banner.title }}</p>
+        </div>
+      </n-carousel>
     </div>
 
     <div class="video" v-for="video in videos" :key="video.id">
 <!--      <router-link :to="{ name: 'video', params: { id: video.id } }">-->
       <router-link :to="`/video/${video.id}`">
-        <img :src="video.pic" :alt="video.title"/>
+        <div class="cover">
+          <img :src="video.pic" :alt="video.title"/>
+          <div class="img-interface"></div>
+          <i class="iconfont icon-shipin1" style="color: #ffffff;"></i>
+          <p class="cover-text">{{ video.id }}</p>
+        </div>
         <h4>{{ video.title }}</h4>
         <div class="meta">
           <h5>{{ video.author_name }}</h5>
@@ -42,7 +60,7 @@ onMounted(async () => {
   grid-template-columns: repeat(auto-fill, 333px);  /* 列宽=卡片宽，容器能放几列放几列 */
   gap: 20px;                                    /* 行距40 列距20，和原来一致 */
   justify-content: center;                           /* 整个网格在容器内居中 */
-  padding: 40px 140px;
+  padding: 40px 120px;
 }
 
 .home-focus {
@@ -50,12 +68,39 @@ onMounted(async () => {
   grid-row: span 2;      /* 纵向占 2 行 → 262×2 + 20 = 544px */
 }
 
-.home-focus img {
-  width: 686px;
-  height: 470px;
+.slide {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.slide-img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 6px;
   display: block;
+}
+
+/* 底部渐变遮罩：黑 -> 透明，从下往上 */
+.slide-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 90px;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.69), rgba(0, 0, 0, 0));
+}
+
+/* 文字：放在圆点上方（圆点 bottom:18px + 高度约16px，故文字放 44px） */
+.slide-text {
+  position: absolute;
+  left: 18px;
+  bottom: 44px;
+  margin: 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
 }
 
 .video {
@@ -63,13 +108,52 @@ onMounted(async () => {
   height: 262px;
 }
 
-/* 2. 封面图与圆角 */
-.video img {
+.video .cover {
+  position: relative;
+  flex-shrink: 0;          /* 防止被 flex 压扁 */
+  line-height: 0;          /* 去掉 img 下方基线间隙 */
+}
+
+.video .cover img {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   display: block;
   border-radius: 6px;
+}
+
+/* 遮罩：现在是 img 的兄弟，盖在图片底部 */
+.video .img-interface {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;                                   /* 9px 太薄，只能当一条黑线 */
+  border-radius: 0 0 6px 6px;                     /* 跟图片下圆角对齐，否则方角露出来 */
+  background: linear-gradient(to top, rgb(0 0 0 / 0.69), rgb(0 0 0 / 0));
+  pointer-events: none;                           /* 不挡鼠标事件 */
+}
+
+.video .iconfont {
+  position: absolute;
+  left: 6px;
+  bottom: 15px;
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+}
+
+.video .cover-text {
+  position: absolute;
+  left: 24px;
+  bottom: 15px;
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
 }
 
 /* 3. 基础容器与 B 站字体栈 */

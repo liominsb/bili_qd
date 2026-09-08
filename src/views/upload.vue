@@ -9,8 +9,8 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const message = useMessage()
 const title = ref<string>("")
-const MAX_IMG_SIZE = 5 * 1024 * 1024        // 封面 5MB
-const MAX_VIDEO_SIZE = 1000 * 1024 * 1024    // 视频 1000MB
+const MAX_IMG_SIZE = 50 * 1024 * 1024        // 封面 50MB
+const MAX_VIDEO_SIZE = 10000 * 1024 * 1024    // 视频 10000MB
 
 function formatSize(size: number) {
   return (size / 1024 / 1024).toFixed(1) + 'MB'
@@ -24,7 +24,7 @@ async function beforeUpload_img(data: { file: UploadFileInfo; fileList: UploadFi
     return false
   }
   if (raw.size > MAX_IMG_SIZE) {
-    message.error(`封面不能超过 5MB，当前 ${formatSize(raw.size)}`)
+    message.error(`封面不能超过 50MB，当前 ${formatSize(raw.size)}`)
     return false
   }
   return true
@@ -38,7 +38,7 @@ async function beforeUpload_video(data: { file: UploadFileInfo; fileList: Upload
     return false
   }
   if (raw.size > MAX_VIDEO_SIZE) {
-    message.error(`单个视频不能超过 200MB，当前 ${formatSize(raw.size)}`)
+    message.error(`单个视频不能超过 10000MB，当前 ${formatSize(raw.size)}`)
     return false
   }
   return true

@@ -152,14 +152,16 @@ async function toggleFollow(authorId: number) {
         <span class="author-name">{{ video.author_name }}</span>
         <span class="author-bio">{{ video.author_bio }} · {{ followerCount }} 粉丝</span>
       </div>
+      </div>
       <n-button
           size="small"
           :type="isFollowing ? 'default' : 'primary'"
           @click="toggleFollow(video.author_id)"
+          style="border-radius: 5px; "
       >
         {{ isFollowing ? '已关注' : '+ 关注' }}
       </n-button>
-    </div>
+
   </div>
   </div>
 </template>
@@ -187,12 +189,14 @@ async function toggleFollow(authorId: number) {
 .aside {
   flex: 1;                  /* 占据剩余全部宽度 */
   min-width: 300px;         /* 太窄的话给个下限 */
+  display: flex;
+  flex-direction: column;
 }
 
 .video-title {
   display: flex;
   flex-direction: column;  /* 改为纵向排列 */
-  padding: 10px;
+  padding: 0 0 20px 0;
   font-family: "PingFang SC", "Microsoft YaHei", "PingFang SC Round", sans-serif;
   height: 80px;
 }
@@ -204,6 +208,7 @@ async function toggleFollow(authorId: number) {
 .video-title .date-text {
   font-size: 13px;
   color: #999;
+  margin-top: auto
 }
 
 /* 视频固定宽高（16:9 示例），并居中 */

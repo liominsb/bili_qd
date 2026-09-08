@@ -10,5 +10,5 @@ const pinia = createPinia()
 app.use(router)
 app.use(pinia)
 app.mount("#app")
-// window.history.replaceState = function() {};
+window.history.replaceState = function() {};
 // 使用这个可能会导致bug，已修复1次
