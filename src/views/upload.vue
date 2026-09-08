@@ -41,6 +41,7 @@ async function beforeUpload_video(data: { file: UploadFileInfo; fileList: Upload
     message.error(`单个视频不能超过 10000MB，当前 ${formatSize(raw.size)}`)
     return false
   }
+  readDuration(raw)
   return true
 }
 
@@ -82,10 +83,26 @@ async function submit() {
     title:title.value,
     pic:uploadResults_img.value,
     video_url:uploadResults_video.value,
+    duration:videoDuration.value
   }
   const r=await addNewVideo(video)
   message.success(r.message)
   router.push({ name: 'home' })
+}
+
+const videoDuration = ref<number>(0)
+
+// 从本地文件读视频时长：造一个 blob 临时地址，塞进不挂页面的 video，
+// 元数据加载完就能拿 duration，然后立刻释放地址
+function readDuration(file: File) {
+  const url = URL.createObjectURL(file)
+  const v = document.createElement('video')
+  v.preload = 'metadata'   // 只加载元数据，不下载视频内容
+  v.src = url
+  v.onloadedmetadata = function () {
+    videoDuration.value = Math.floor(v.duration)
+    URL.revokeObjectURL(url)  // 用完就释放，不然内存里一直挂着这个 blob
+  }
 }
 </script>
 

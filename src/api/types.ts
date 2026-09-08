@@ -1,10 +1,3 @@
-export interface ApiResponse<T = any> {
-    code: number
-    message: string
-    ttl: number
-    data: T
-}
-
 export interface User {
     id:number
     username:string
@@ -29,12 +22,14 @@ export interface VideoItem {
     author_name: string
     author_image: string
     author_bio: string
+    duration : number
 }
 
 export interface VideoInput {
     title: string
     pic: string
     video_url: string
+    duration : number
 }
 
 export interface CommentItem {

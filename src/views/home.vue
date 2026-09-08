@@ -2,7 +2,7 @@
 import {getVideos} from "../api/video.ts";
 import type {VideoItem} from "../api/types.ts";
 import {onMounted, ref} from "vue";
-import {formatPubdate} from "../utils/format.ts";
+import {formatDuration, formatPubdate} from "../utils/format.ts";
 
 const videos = ref<VideoItem[]>([])
 // 2. 在组件挂载时异步请求
@@ -43,6 +43,7 @@ const banners = [
           <div class="img-interface"></div>
           <i class="iconfont icon-shipin1" style="color: #ffffff;"></i>
           <p class="cover-text">{{ video.id }}</p>
+          <p class="cover-time">{{ formatDuration(video.duration) }}</p>
         </div>
         <h4>{{ video.title }}</h4>
         <div class="meta">
@@ -154,6 +155,19 @@ const banners = [
   font-size: 14px;
   font-weight: 500;
   text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  pointer-events: none;
+}
+
+.video .cover-time{
+  position: absolute;
+  right: 8px;
+  bottom: 15px;
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  pointer-events: none;
 }
 
 /* 3. 基础容器与 B 站字体栈 */
