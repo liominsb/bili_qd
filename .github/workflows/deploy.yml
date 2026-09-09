@@ -1,0 +1,49 @@
+name: Deploy Vue Frontend to Tencent Cloud
+
+on:
+  push:
+    branches: [ master, main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 拉取前端代码
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. 安装 Node.js 20 环境并开启 npm 缓存
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 3. 云端安装依赖并打包出 dist 静态文件
+      - name: Install Dependencies & Build
+        run: |
+          npm install
+          npm run build
+
+      # 4. 把编译出的 dist 目录通过 SCP 同步覆盖到服务器
+      - name: Copy dist to Server via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: "dist"
+          target: "/root/gobili/go_bili_qd"
+
+      # 5. 重启 Nginx 容器确保前端无缝生效
+      - name: Reload Nginx
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            docker compose -f /root/gobili/docker-compose.prod.yml restart nginx
