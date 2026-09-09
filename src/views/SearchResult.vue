@@ -6,6 +6,7 @@ import {searchVideoByTitle} from '../api/video.ts'
 import type {VideoItem} from '../api/types.ts'
 import {formatPubdate} from "../utils/format.ts";
 
+
 const route = useRoute()
 const keyword = ref(route.query.q as string || '')
 const results = ref<VideoItem[]>([])

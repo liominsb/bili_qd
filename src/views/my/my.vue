@@ -34,14 +34,6 @@ onMounted(async function () {
             <div class="stat-num">{{ userStore.fansNum }}</div>
             <div class="stat-label">粉丝数</div>
           </router-link>
-          <div class="stat-item">
-            <div class="stat-num">{{ userStore.likeNum || 284 }}</div>
-            <div class="stat-label">获赞数</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num">{{ userStore.playNum || '7.1万' }}</div>
-            <div class="stat-label">播放数</div>
-          </div>
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import axios from 'axios'
 import useUserStore from "../store/user.ts";
 
 const request = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: '',
     timeout: 5000
 })
 

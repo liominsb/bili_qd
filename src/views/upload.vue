@@ -5,7 +5,11 @@ import { ref } from 'vue'
 import type {VideoInput} from '../api/types.ts'
 import {addNewVideo} from '../api/video.ts'
 import { useRouter } from 'vue-router'
+import  {useUiStore}  from '../store/ui.ts'
+import  useUserStore  from '../store/user.ts'
 
+const uiStore = useUiStore()
+const userStore = useUserStore()
 const router = useRouter()
 const message = useMessage()
 const title = ref<string>("")
@@ -17,6 +21,11 @@ function formatSize(size: number) {
 }
 
 async function beforeUpload_img(data: { file: UploadFileInfo; fileList: UploadFileInfo[] }) {
+  if (!userStore.isLogin) {
+    message.warning('请先登录后再上传封面')
+    uiStore.openLogin()
+    return false // 👈 关键：返回 false 就不会发起上传网络请求！
+  }
   const raw = data.file.file
   if (!raw) return false
   if (!['image/png', 'image/jpeg', 'image/webp'].includes(raw.type)) {
@@ -31,6 +40,11 @@ async function beforeUpload_img(data: { file: UploadFileInfo; fileList: UploadFi
 }
 
 async function beforeUpload_video(data: { file: UploadFileInfo; fileList: UploadFileInfo[] }) {
+  if (!userStore.isLogin) {
+    message.warning('请先登录后再上传视频')
+    uiStore.openLogin()
+    return false // 👈 关键：返回 false 就不会发起上传网络请求！
+  }
   const raw = data.file.file
   if (!raw) return false
   if (data.file.file?.type !== 'video/mp4') {
@@ -51,7 +65,7 @@ const uploadResults_img = ref<string>('')
 function handleFinish_img({ file, event }: { file: UploadFileInfo; event?: ProgressEvent }) {
   const xhr = event?.target as XMLHttpRequest
   const resp = JSON.parse(xhr.response) as { url: string }
-  uploadResults_img.value = 'http://localhost:3000' + resp.url
+  uploadResults_img.value = resp.url
   file.url = resp.url
   file.name = file.name || resp.url.split('/').pop() || 'uploaded'
   return file
@@ -60,13 +74,18 @@ function handleFinish_img({ file, event }: { file: UploadFileInfo; event?: Progr
 function handleFinish_video({ file, event }: { file: UploadFileInfo; event?: ProgressEvent }) {
   const xhr = event?.target as XMLHttpRequest
   const resp = JSON.parse(xhr.response) as { url: string }
-  uploadResults_video.value='http://localhost:3000' + resp.url
+  uploadResults_video.value= resp.url
   file.url = resp.url
   file.name = file.name || resp.url.split('/').pop() || 'uploaded'
   return file
 }
 
 async function submit() {
+  if (!userStore.isLogin) {
+    message.error('未登录无法发布，请先登录！')
+    uiStore.openLogin()
+    return
+  }
   if (!title.value.trim()) {
     message.error('请先填写视频标题')
     return
@@ -123,7 +142,7 @@ function readDuration(file: File) {
 
       <n-upload
           class="upload-box upload-box--img"
-          action="http://localhost:3000/api/v1/upload"
+          action="/api/v1/upload"
           :max="1"
           accept="image/png,image/jpeg,image/webp"
           @beforeUpload="beforeUpload_img"
@@ -137,7 +156,7 @@ function readDuration(file: File) {
         </n-upload-dragger>
       </n-upload>
 
-      <div class="tip">建议 16:9，png / jpg / webp，≤5MB</div>
+      <div class="tip">建议 16:9，png / jpg / webp，≤50MB</div>
     </div>
 
     <!-- 视频：拖拽上传框 -->
@@ -148,7 +167,7 @@ function readDuration(file: File) {
           class="upload-box upload-box--video"
           multiple
           directory-dnd
-          action="http://localhost:3000/api/v1/upload"
+          action="/api/v1/upload"
           :max="1"
           accept="video/mp4"
           @beforeUpload="beforeUpload_video"
@@ -162,7 +181,7 @@ function readDuration(file: File) {
         </n-upload-dragger>
       </n-upload>
 
-      <div class="tip">仅支持 mp4，单个 ≤200MB，最多 5 个</div>
+      <div class="tip">仅支持 mp4，单个 ≤10000MB，最多 5 个</div>
     </div>
   </div>
   <button @click="submit" title="发布"/>

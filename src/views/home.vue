@@ -1,18 +1,50 @@
 <script setup lang="ts">
 import {getVideos} from "../api/video.ts";
 import type {VideoItem} from "../api/types.ts";
-import {onMounted, ref} from "vue";
+import {onMounted, onUnmounted, ref} from "vue";
 import {formatDuration, formatPubdate} from "../utils/format.ts";
 
 const videos = ref<VideoItem[]>([])
-// 2. 在组件挂载时异步请求
-onMounted(async () => {
+const offset = ref(0)          // 当前已加载到第几条，下一页从这里开始
+const limit = 20
+const loading = ref(false)     // 请求进行中，防止重复触发
+const hasMore = ref(true)      // 后端还有没有更多数据
+
+// 加载一页数据：offset 累加，结果拼到已有列表后面
+async function loadMore() {
+  if (loading.value || !hasMore.value) return
+  loading.value = true
   try {
-    videos.value = await getVideos(0, 20)
-  }
-   catch (error) {
+    const list = await getVideos(offset.value, limit)
+    videos.value = videos.value.concat(list)
+    offset.value += list.length
+    // 返回条数不足 limit，说明这是最后一页
+    if (list.length < limit) {
+      hasMore.value = false
+    }
+  } catch (error) {
     console.error('获取推荐视频失败:', error)
+  } finally {
+    loading.value = false
   }
+}
+
+function onScroll() {
+  const scrollBottom = window.scrollY + window.innerHeight
+  const docHeight = document.documentElement.scrollHeight
+  if (docHeight - scrollBottom < 200) {
+    loadMore()
+  }
+}
+
+onMounted(function () {
+      loadMore()  // 首屏先加载一页
+      window.addEventListener('scroll', onScroll)
+    }
+)
+
+onUnmounted(function () {
+  window.removeEventListener('scroll', onScroll)
 })
 
 const banners = [
@@ -51,6 +83,11 @@ const banners = [
           <h5>· {{ formatPubdate(Math.floor(new Date(video.created_at).getTime() / 1000)) }}</h5>
         </div>
       </router-link>
+    </div>
+    <!-- 底部哨兵：横跨整行，进入视口就触发加载 -->
+    <div class="load-more">
+      <p v-if="loading">加载中...</p>
+      <p v-else-if="!hasMore">没有更多了</p>
     </div>
   </div>
 </template>
@@ -222,5 +259,13 @@ const banners = [
 .video:hover h4,
 .video:hover h5 {
   color: #00aeec;
+}
+
+.load-more {
+  grid-column: 1 / -1;   /* 横跨整个网格的所有列 */
+  text-align: center;
+  padding: 20px 0;
+  color: #9499a0;
+  font-size: 14px;
 }
 </style>
