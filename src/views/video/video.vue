@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { getVideoById,updateVideoLike } from '../../api/video.ts'
+import { getVideoById,updateVideoLike,getVideos } from '../../api/video.ts'
 import {getCommentsByVideoId,addNewComments} from '../../api/comment.ts'
-import {computed, onMounted, onUnmounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref, watch} from "vue";
 import type {VideoItem,CommentItem} from '../../api/types.ts'
-import {formatPubdate} from "../../utils/format.ts";
+import {formatDuration, formatPubdate} from "../../utils/format.ts";
 import {useUiStore} from "../../store/ui.ts";
 import useUserStore from '../../store/user.ts'
 import { followUser, unfollowUser, getFollowStats } from '../../api/follow.ts'
@@ -16,12 +16,13 @@ const message = useMessage()
 const route = useRoute()
 defineProps(['id'])
 const video = ref<VideoItem | null>(null)
+const videos = ref<VideoItem[] | null>(null)
 const comments = ref<CommentItem[]>([])
 onMounted(async () => {
-  video.value=(await getVideoById(route.params.id as string))
-  comments.value=(await getCommentsByVideoId(video.value?.id as number))
+  loadData(route.params.id as string)
   loadFollowState(video.value?.author_id as number)
   ui.collapseBanner()
+
 })
 onUnmounted(() => {
   ui.expandBanner()
@@ -86,6 +87,25 @@ async function toggleFollow(authorId: number) {
     message.error(err instanceof Error ? err.message : '操作失败')
   }
 }
+
+async function loadData(id: string | number) {
+  video.value = await getVideoById(String(id))
+  comments.value = await getCommentsByVideoId(Number(id))
+  if (video.value) {
+    loadFollowState(video.value.author_id)
+  }
+  videos.value=(await getVideos(0, 10))
+}
+
+watch(
+    () => route.params.id,
+    (newId) => {
+      if (newId) {
+        loadData(newId as string)
+        window.scrollTo({ top: 0, behavior: 'smooth' }) // 顺便滚回顶部
+      }
+    }
+)
 
 </script>
 
@@ -166,7 +186,26 @@ async function toggleFollow(authorId: number) {
       >
         {{ isFollowing ? '已关注' : '+ 关注' }}
       </n-button>
-
+      <div class="recommended_videos" v-for="vid in videos" :key="vid.id">
+        <n-card :bordered="false" size="small" style="width: 411px; margin-bottom: 10px;">
+          <router-link :to="`/video/${vid.id}`" class="card-link">
+            <!-- 1. 左侧封面 -->
+            <div class="cover">
+              <img :src="vid.pic" alt="视频封面" />
+              <span class="cover-time">{{ formatDuration(vid.duration) }}</span>
+            </div>
+            <!-- 2. 右侧信息 -->
+            <div class="video-info">
+              <h4 class="title">{{ vid.title }}</h4>
+              <div class="author">{{ vid.author_name }}</div>
+              <div class="meta">
+                <i class="iconfont icon-shipin1"></i>
+                <span>{{ vid.view_count }}</span>
+              </div>
+            </div>
+          </router-link>
+        </n-card>
+      </div>
   </div>
   </div>
 </template>
@@ -323,4 +362,93 @@ video {
   font-size: 13px;
   color: #999;
 }
+
+/* 卡片链接：左右横向布局，设置 10px 间距 */
+.card-link {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 1. 左侧封面容器：固定宽高，相对定位 */
+.cover {
+  position: relative;
+  width: 189px;
+  height: 107px;
+  flex-shrink: 0;         /* 禁止被 flex 挤压变形 */
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 封面右下角时长（仿 B 站黑色半透明小胶囊） */
+.cover-time {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  font-size: 12px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.65);
+  padding: 1px 4px;
+  border-radius: 4px;
+  line-height: 14px;
+  pointer-events: none;
+}
+
+/* 2. 右侧信息容器：竖向排列，上下分散对齐 */
+.recommended_videos .video-info {
+  display: flex;
+  flex-direction: column;
+  justify-content:flex-start; /* 标题在顶部，作者和播放量在底部 */
+  flex: 1;
+  min-width: 0;                   /* 关键：允许子元素截断，防止撑开 */
+  height: 107px;                  /* 高度和图片 107px 严格一致 */
+}
+
+/* 标题：最多显示 2 行，超出省略号 */
+.recommended_videos .video-info .title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #18191c;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+/* 作者名称 */
+.recommended_videos .video-info .author {
+  font-size: 14px;
+  color: #9499a0;
+  line-height: 16px;
+}
+
+/* 底部播放量与图标（横向居中对齐） */
+.recommended_videos .video-info .meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #9499a0;
+}
+
+/* 播放图标：改为浅灰色，不再使用看不见的白色 */
+.recommended_videos .video-info .meta .iconfont {
+  font-size: 14px;
+  color: #9499a0;
+}
+
 </style>
