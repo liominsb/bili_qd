@@ -93,7 +93,12 @@ const useUserStore = defineStore('user', () => {
         setToken(res.token, res.refreshToken)
     }
 
-    return { token, refreshToken, id, name, bio, image, followNum, fansNum, isLogin, login, fetchMe, logout,register, updateMyUserinfo, updateMyPassword,refreshTokenFunc, fetchFollowStats }
+    const loginWithTokens = async function (t: string, rt: string) {
+        setToken(t, rt)
+        await fetchMe()
+    }
+
+    return { token, refreshToken, id, name, bio, image, followNum, fansNum, isLogin, login, fetchMe, logout,register, updateMyUserinfo, updateMyPassword,refreshTokenFunc, fetchFollowStats,loginWithTokens }
 })
 
 export default useUserStore

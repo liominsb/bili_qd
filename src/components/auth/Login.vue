@@ -42,6 +42,12 @@ const handleRegister = async () => {
     message.error(err instanceof Error ? err.message : '操作失败')
   }
 }
+
+// 第三方登录：整页跳转到后端入口，由后端 302 到 GitHub 授权页。
+// 不能用 axios —— 这是浏览器跳转，axios 只会把 302 响应体读回来，页面不会真的跳走。
+const handleGithubLogin = function () {
+  window.location.href = '/api/auth/github/login'
+}
 </script>
 
 <template>
@@ -73,6 +79,12 @@ const handleRegister = async () => {
                 <n-button attr-type="button" type="primary" block class="submit" @click="handleLogin">登录</n-button>
               </div>
             </n-form>
+
+            <!-- 第三方登录：和上面的账号密码登录是两条独立的路 -->
+            <div class="oauth-divider">其他登录方式</div>
+            <n-button attr-type="button" block class="github-btn" @click="handleGithubLogin">
+              使用 GitHub 登录
+            </n-button>
           </div>
         </n-config-provider>
       </div>
@@ -122,6 +134,29 @@ const handleRegister = async () => {
 /* 两个按钮等分宽度；block 让内部填满 */
 .submit {
   flex: 1;
+}
+
+/* 分割线：中间是文字，两侧各有一条自动撑开的细线 */
+.oauth-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 12px;
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+}
+/* ::before / ::after 是两个「伪元素」，不需要在模板里写标签就能凭空生成两个盒子。
+   它们参与 flex 布局，flex: 1 让两者平分所有剩余空间 —— 文字自然被挤在正中间。 */
+.oauth-divider::before,
+.oauth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #ececec;
+}
+.github-btn {
+  font-size: 13px;
 }
 
 /* Transition 动画:淡入 + 轻微放大 */

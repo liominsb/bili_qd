@@ -65,13 +65,18 @@ const router=createRouter(
             {
                 path: '/search',
                 name: 'Search',
-                component: ()=> import('../views/SearchResult.vue')
+                component: ()=> import('../views/video/SearchResult.vue')
             },
             {
                 path:'/upload',
                 name:'upload',
                 component:()=> import('../views/upload.vue')
-            }
+            },
+            {
+                path: '/oauth/callback',
+                name: 'OauthCallback',
+                component: () => import('../views/OauthCallback.vue')
+            },
         ]
     }
 )

@@ -2,9 +2,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import {ref, watch} from 'vue'
-import {searchVideoByTitle} from '../api/video.ts'
-import type {VideoItem} from '../api/types.ts'
-import {formatPubdate} from "../utils/format.ts";
+import {searchVideoByTitle} from '../../api/video.ts'
+import type {VideoItem} from '../../api/types.ts'
+import {formatPubdate} from "../../utils/format.ts";
 
 
 const route = useRoute()
