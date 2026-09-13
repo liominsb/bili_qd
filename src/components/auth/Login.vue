@@ -83,6 +83,7 @@ const handleGithubLogin = function () {
             <!-- 第三方登录：和上面的账号密码登录是两条独立的路 -->
             <div class="oauth-divider">其他登录方式</div>
             <n-button attr-type="button" block class="github-btn" @click="handleGithubLogin">
+              <i class="iconfont icon-GitHub" style="padding: 10px"></i>
               使用 GitHub 登录
             </n-button>
           </div>
