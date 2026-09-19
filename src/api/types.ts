@@ -62,3 +62,15 @@ export interface FollowStats {
     follower_count: number
     is_following: boolean
 }
+
+export interface HistoryItem {
+    video_id: number
+    progress: number
+    updated_at: string
+    title: string
+    pic: string
+    duration: number
+    view_count: number
+    author_id: number
+    author_name: string
+}

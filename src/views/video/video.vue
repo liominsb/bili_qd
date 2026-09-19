@@ -2,12 +2,13 @@
 import { useRoute } from 'vue-router'
 import { getVideoById,updateVideoLike,getVideos } from '../../api/video.ts'
 import {getCommentsByVideoId,addNewComments} from '../../api/comment.ts'
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from "vue";
 import type {VideoItem,CommentItem} from '../../api/types.ts'
 import {formatDuration, formatPubdate} from "../../utils/format.ts";
 import {useUiStore} from "../../store/ui.ts";
 import useUserStore from '../../store/user.ts'
 import { followUser, unfollowUser, getFollowStats } from '../../api/follow.ts'
+import { reportHistory } from '../../api/history.ts'
 import dayjs from 'dayjs'
 import { useMessage } from 'naive-ui'
 
@@ -20,12 +21,19 @@ const videos = ref<VideoItem[] | null>(null)
 const comments = ref<CommentItem[]>([])
 onMounted(async () => {
   loadData(route.params.id as string)
-  loadFollowState(video.value?.author_id as number)
   ui.collapseBanner()
-
+  window.addEventListener('pagehide', onPageHide) // 刷新/关标签页时还能抢救一次
+})
+// ⚠️ 上报必须放在 beforeUnmount，不能挪到 unmounted：
+// unmounted 触发时 DOM 已被移除、videoRef 已变成 null，那时读 currentTime 只会得到 0，
+// 一上报就把用户刚攒的进度清零。这里没有别的兜底，钩子时机就是唯一保障。
+onBeforeUnmount(() => {
+  sendHistory() // 离开页面前把进度存下来
 })
 onUnmounted(() => {
-  ui.expandBanner()
+  stopTimer()
+  window.removeEventListener('pagehide', onPageHide)
+  ui.expandBanner() // 等页面拆完再展开顶部 banner
 })
 // ok = true 表示当前已赞
 const ok = ref<boolean>(false)
@@ -101,11 +109,58 @@ watch(
     () => route.params.id,
     (newId) => {
       if (newId) {
+        sendHistory() // 先把【旧】视频的进度存下来，再加载新的
+        hasPlayed = false  // 新视频的"看过"重新计
+        stopTimer()
         loadData(newId as string)
         window.scrollTo({ top: 0, behavior: 'smooth' }) // 顺便滚回顶部
       }
     }
 )
+
+// ===== 播放历史上报 =====
+// 首次 play 立即上报（保证"看过"能进历史），播放中每 1 分钟兜底一次，
+// 暂停/切视频/离开页面时各存一次；页面真卸载时只有 keepalive 请求发得出去。
+const videoRef = ref<HTMLVideoElement | null>(null)
+let timer: number | null = null   // 播放中的周期上报定时器
+let hasPlayed = false             // 没点过播放的页面不产生历史记录
+
+const REPORT_INTERVAL = 60 * 1000 // 1 分钟
+
+function startTimer() {
+  stopTimer()
+  timer = window.setInterval(function () {
+    sendHistory()
+  }, REPORT_INTERVAL)
+}
+
+function stopTimer() {
+  if (timer !== null) {
+    clearInterval(timer)
+    timer = null
+  }
+}
+
+function sendHistory() {
+  if (!hasPlayed || !video.value) return
+  reportHistory(video.value.id, Math.floor(videoRef.value?.currentTime ?? 0)).catch(function () {})
+}
+
+function onPlay() {
+  hasPlayed = true
+  sendHistory() // 首次 play 立刻记一笔
+  startTimer()
+}
+
+function onPause() {
+  sendHistory() // 暂停是天然的保存点
+  stopTimer()        // 暂停期间不计时
+}
+
+// 页面真卸载（刷新/关标签页/关浏览器）时才走这里
+function onPageHide() {
+  sendHistory()
+}
 
 </script>
 
@@ -122,7 +177,7 @@ watch(
 
         </div>
         <div class="video-wrapper">
-          <video :src="src" controls></video>
+          <video ref="videoRef" :src="src" controls @play="onPlay" @pause="onPause"></video>
         </div>
         <div class="video-data">
           <i class="iconfont icon-dianzan" :class="{ 'liked': ok }" @click="updateVL(video.id)"></i>
