@@ -4,7 +4,8 @@ import { useRoute } from 'vue-router'
 import {ref, watch} from 'vue'
 import {searchVideoByTitle} from '../../api/video.ts'
 import type {VideoItem} from '../../api/types.ts'
-import {formatDuration, formatPubdate} from "../../utils/format.ts";
+import {formatPubdate} from "../../utils/format.ts";
+import VideoCard from '../../components/VideoCard.vue'
 
 
 const route = useRoute()
@@ -22,23 +23,13 @@ watch(() => route.query.q, (newQ) => {
 
 <template>
   <div class="search-result">
-    <div class="video" v-for="video in results" :key="video.id">
-      <!--      <router-link :to="{ name: 'video', params: { id: video.id } }">-->
-      <router-link :to="`/video/${video.id}`">
-        <div class="cover">
-          <img :src="video.pic" :alt="video.title"/>
-          <div class="img-interface"></div>
-          <i class="iconfont icon-shipin1" style="color: #ffffff;"></i>
-          <p class="cover-text">{{ video.view_count }}</p>
-          <p class="cover-time">{{ formatDuration(video.duration) }}</p>
-        </div>
-        <h4>{{ video.title }}</h4>
-        <div class="meta">
-          <h5>{{ video.author_name }}</h5>
-          <h5>· {{ formatPubdate(Math.floor(new Date(video.created_at).getTime() / 1000)) }}</h5>
-        </div>
-      </router-link>
-    </div>
+    <VideoCard
+      v-for="video in results"
+      :key="video.id"
+      :video="video"
+      :video-id="video.id"
+      :time-text="formatPubdate(Math.floor(new Date(video.created_at).getTime() / 1000))"
+    />
   </div>
 </template>
 
@@ -51,123 +42,10 @@ watch(() => route.query.q, (newQ) => {
   padding: 40px 120px;
 }
 
+/* 卡片尺寸归页面管：本页网格列宽 333，卡片就 333×262
+   （组件根节点同时带父子两个 data-v，所以这里改得到组件根元素） */
 .video {
   width: 333px;
   height: 262px;
-}
-
-.video .cover {
-  position: relative;
-  flex-shrink: 0;          /* 防止被 flex 压扁 */
-  line-height: 0;          /* 去掉 img 下方基线间隙 */
-}
-
-.video .cover img {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  display: block;
-  border-radius: 6px;
-}
-
-/* 遮罩：现在是 img 的兄弟，盖在图片底部 */
-.video .img-interface {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 40px;                                   /* 9px 太薄，只能当一条黑线 */
-  border-radius: 0 0 6px 6px;                     /* 跟图片下圆角对齐，否则方角露出来 */
-  background: linear-gradient(to top, rgb(0 0 0 / 0.69), rgb(0 0 0 / 0));
-  pointer-events: none;                           /* 不挡鼠标事件 */
-}
-
-.video .iconfont {
-  position: absolute;
-  left: 6px;
-  bottom: 15px;
-  margin: 0;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
-}
-
-.video .cover-text {
-  position: absolute;
-  left: 24px;
-  bottom: 15px;
-  margin: 0;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
-  pointer-events: none;
-}
-
-.video .cover-time{
-  position: absolute;
-  right: 8px;
-  bottom: 15px;
-  margin: 0;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
-  pointer-events: none;
-}
-
-/* 3. 基础容器与 B 站字体栈 */
-.video a {
-  text-decoration: none;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  font-family: PingFang SC, HarmonyOS_Regular, Helvetica Neue, Microsoft YaHei, sans-serif !important;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* 4. 视频标题：锁定 2 行高度并防止被 Flex 压缩截断 */
-.video h4 {
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 20px;
-  max-height: 40px;          /* 20px * 2行 = 40px */
-  margin: 8px 0 0 0;
-  flex-shrink: 0;            /* 核心：禁止被 flex 容器挤压导致第二行下半部分被裁 */
-  color: #18191c;
-
-  /* 多行截断与省略号 */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-all;
-  transition: color 0.2s ease;
-}
-
-/* 5. 底部作者与时间：贴底对齐 */
-.meta {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-top: auto;          /* 吸收多余空间沉底 */
-  padding: 4px 0 0 0;
-}
-
-.meta h5 {
-  font-size: 12px;
-  font-weight: 400;
-  color: #9499a0;
-  margin: 0;
-  transition: color 0.2s ease;
-}
-
-/* 悬停联动效果 */
-.video:hover h4,
-.video:hover h5 {
-  color: #00aeec;
 }
 </style>
