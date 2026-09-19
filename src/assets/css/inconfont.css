@@ -1,8 +1,8 @@
 @font-face {
     font-family: "iconfont"; /* Project id 5221040 */
-    src: url('//at.alicdn.com/t/c/font_5221040_px8z4rqcqiq.woff2?t=1789314049656') format('woff2'),
-    url('//at.alicdn.com/t/c/font_5221040_px8z4rqcqiq.woff?t=1789314049656') format('woff'),
-    url('//at.alicdn.com/t/c/font_5221040_px8z4rqcqiq.ttf?t=1789314049656') format('truetype');
+    src: url('//at.alicdn.com/t/c/font_5221040_5e888xrxi1g.woff2?t=1789816887189') format('woff2'),
+    url('//at.alicdn.com/t/c/font_5221040_5e888xrxi1g.woff?t=1789816887189') format('woff'),
+    url('//at.alicdn.com/t/c/font_5221040_5e888xrxi1g.ttf?t=1789816887189') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,18 @@
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-shoucang1:before {
+    content: "\e625";
+}
+
+.icon-dianzan_kuai:before {
+    content: "\ec8c";
+}
+
+.icon-shoucang:before {
+    content: "\e629";
 }
 
 .icon-GitHub:before {
@@ -29,10 +41,6 @@
     content: "\e601";
 }
 
-.icon-dianzan:before {
-    content: "\e613";
-}
-
 .icon-xiaoxi:before {
     content: "\e600";
 }
@@ -43,10 +51,6 @@
 
 .icon-zhongbiao:before {
     content: "\e60e";
-}
-
-.icon-shoucang:before {
-    content: "\e625";
 }
 
 .icon-gerenzhongxin:before {

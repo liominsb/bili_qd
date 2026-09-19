@@ -74,3 +74,20 @@ export interface HistoryItem {
     author_id: number
     author_name: string
 }
+
+export interface FavoriteStats {
+    favorite_count: number
+    is_favorite: boolean
+}
+
+export interface FavoriteItem {
+    video_id: number
+    created_at: string          // 收藏时间
+    title: string
+    pic: string
+    duration: number
+    view_count: number
+    author_id: number
+    author_name: string
+    deleted_at: string | null   // null=视频有效；非 null=已失效，页面渲染灰卡片
+}

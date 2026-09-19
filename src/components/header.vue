@@ -87,7 +87,7 @@ function handleDropdownSelect (key:string) {
           <span>动态</span>
         </router-link>
         <router-link to="/my/favorites" class="nav-item">
-          <i class="iconfont icon-shoucang"></i>
+          <i class="iconfont icon-shoucang1"></i>
           <span>收藏</span>
         </router-link>
         <router-link to="/my/history" class="nav-item">

@@ -8,6 +8,7 @@ import {formatDuration, formatPubdate} from "../../utils/format.ts";
 import {useUiStore} from "../../store/ui.ts";
 import useUserStore from '../../store/user.ts'
 import { followUser, unfollowUser, getFollowStats } from '../../api/follow.ts'
+import { favoriteVideo, unfavoriteVideo, getFavoriteStats } from '../../api/favorite.ts'
 import { reportHistory } from '../../api/history.ts'
 import dayjs from 'dayjs'
 import { useMessage } from 'naive-ui'
@@ -96,11 +97,47 @@ async function toggleFollow(authorId: number) {
   }
 }
 
+// ===== 收藏 =====
+const isFavorited = ref(false)
+const favoriteCount = ref(0)
+
+async function loadFavoriteState(videoId: number) {
+  const stats = await getFavoriteStats(videoId)
+  isFavorited.value = stats.is_favorite
+  favoriteCount.value = stats.favorite_count
+}
+
+async function toggleFavorite() {
+  if (!userStore.isLogin) {
+    message.warning('请先登录')
+    return
+  }
+  const videoId = video.value?.id
+  if (!videoId) return
+  try {
+    if (isFavorited.value) {
+      await unfavoriteVideo(videoId)
+      favoriteCount.value--
+      isFavorited.value = false
+      message.success('已取消收藏')
+    } else {
+      await favoriteVideo(videoId)
+      favoriteCount.value++
+      isFavorited.value = true
+      message.success('收藏成功')
+    }
+  } catch (err) {
+    // err 就是拦截器抛出的 Error，.message 是后端返回的错误信息
+    message.error(err instanceof Error ? err.message : '操作失败')
+  }
+}
+
 async function loadData(id: string | number) {
   video.value = await getVideoById(String(id))
   comments.value = await getCommentsByVideoId(Number(id))
   if (video.value) {
     loadFollowState(video.value.author_id)
+    loadFavoriteState(video.value.id)
   }
   videos.value=(await getVideos(0, 10))
 }
@@ -180,8 +217,10 @@ function onPageHide() {
           <video ref="videoRef" :src="src" controls @play="onPlay" @pause="onPause"></video>
         </div>
         <div class="video-data">
-          <i class="iconfont icon-dianzan" :class="{ 'liked': ok }" @click="updateVL(video.id)"></i>
+          <i class="iconfont icon-dianzan_kuai" :class="{ 'liked': ok }" @click="updateVL(video.id)"></i>
           <span>{{video.like_count}}</span>
+          <i class="iconfont icon-shoucang" :class="{ 'favorited': isFavorited }" @click="toggleFavorite()"></i>
+          <span>{{ favoriteCount }}</span>
         </div>
         <n-divider />
         <div class="video-text">
@@ -353,7 +392,7 @@ video {
   margin-left: 10px;
 }
 
-.icon-dianzan {          /* 选择器：选中 class 为 "icon-dianzan" 的元素 */
+.icon-dianzan_kuai {          /* 选择器：选中 class 为 "icon-dianzan_kuai" 的元素 */
   font-size: 24px;       /* 图标大小：24 像素（因为它是字体图标） */
   color: #999;           /* 图标颜色：中灰色 #999 */
   cursor: pointer;       /* 鼠标悬停时显示"小手"光标，提示可点击 */
@@ -361,8 +400,27 @@ video {
 
 }
 
-.icon-dianzan.liked {
+.icon-dianzan_kuai.liked {
   color: #fb7299;
+}
+
+/* 点赞/收藏那一行：横向排列 + 垂直居中对齐（原来图标和数字是 inline，对齐靠基线） */
+.video-data {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-shoucang {
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  transition: color .2s;
+  margin-left: 20px;     /* 跟点赞之间留点距离 */
+}
+
+.icon-shoucang.favorited {
+  color: #ffb027;        /* 收藏用 B 站的金黄色，跟点赞的粉色区分开 */
 }
 
 .comment {
