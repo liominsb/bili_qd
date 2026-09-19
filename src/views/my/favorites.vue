@@ -90,7 +90,16 @@ async function handleUnfavorite(videoId: number) {
       >
         <!-- 取消收藏按钮放在链接外（#extra 以整张卡片为定位上下文） -->
         <template #extra>
-          <button class="del-btn" title="取消收藏" @click.prevent.stop="handleUnfavorite(item.video_id)">×</button>
+          <n-popconfirm
+              @positive-click="handleUnfavorite(item.video_id)"
+              negative-text="取消"
+              positive-text="确定"
+          >
+            <template #trigger>
+              <n-button class="del-btn">×</n-button>
+            </template>
+              <p>确定要取消收藏吗？</p>
+          </n-popconfirm>
         </template>
       </VideoCard>
 
@@ -162,8 +171,8 @@ async function handleUnfavorite(videoId: number) {
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: rgba(0, 0, 0, .6);
-  color: #fff;
+  background: rgb(255 255 255 / 0.56);
+  color: #000000;
   font-size: 15px;
   line-height: 1;
   cursor: pointer;

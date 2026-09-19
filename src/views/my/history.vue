@@ -117,7 +117,16 @@ async function handleClear() {
         </div>
       </template>
       <template #extra>
-        <button class="del-btn" title="删除这条记录" @click.prevent.stop="handleDelete(item.video_id)">×</button>
+        <n-popconfirm
+            @positive-click="handleDelete(item.video_id)"
+            negative-text="取消"
+            positive-text="确定"
+        >
+          <template #trigger>
+            <n-button class="del-btn">×</n-button>
+          </template>
+          <p>确定要删除这条记录吗？</p>
+        </n-popconfirm>
       </template>
     </VideoCard>
 
@@ -196,8 +205,8 @@ async function handleClear() {
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: rgba(0, 0, 0, .6);
-  color: #fff;
+  background: rgb(255 255 255 / 0.56);
+  color: #000000;
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
@@ -220,4 +229,5 @@ async function handleClear() {
 .load-more .empty {
   color: #999;
 }
+
 </style>

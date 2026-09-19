@@ -132,13 +132,6 @@ const banners = [
   text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
 }
 
-/* 卡片尺寸归页面管：本页网格列宽 333，卡片就 333×262
-   （组件根节点同时带父子两个 data-v，所以这里改得到组件根元素） */
-.video {
-  width: 333px;
-  height: 262px;
-}
-
 .load-more {
   grid-column: 1 / -1;   /* 横跨整个网格的所有列 */
   text-align: center;
