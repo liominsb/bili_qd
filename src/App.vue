@@ -23,7 +23,7 @@ const themeOverrides = {
 
 <template>
   <div class="app">
-    <n-back-top :right="75"  />
+    <n-back-top :right="75" :color="themeOverrides.common.primaryColor" />
     <n-config-provider :theme-overrides="themeOverrides">
       <div class="header-wrapper">
         <headerBil />
