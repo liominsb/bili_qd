@@ -1,5 +1,5 @@
 import request from '../utils/request'
-import type {VideoItem,VideoInput} from './types'
+import type {VideoItem,VideoInput,VideoLike} from './types'
 
 
 export async function getVideos(offset: number, limit: number): Promise<VideoItem[]> {
@@ -7,8 +7,8 @@ export async function getVideos(offset: number, limit: number): Promise<VideoIte
     return res.videos
 }
 
-export async function getVideoById(id: string): Promise<VideoItem> {
-    const res = await request.get<any, { video: VideoItem }>(`/api/v1/videos/${id}`)
+export async function getVideoById(videoId: string): Promise<VideoItem> {
+    const res = await request.get<any, { video: VideoItem }>(`/api/v1/videos/${videoId}`)
     return res.video
 }
 
@@ -20,8 +20,8 @@ export async function updateVideo(VideoInput: VideoInput,id: string){
     return await request.put<any,{message:string}>(`/api/v1/videos/${id}`, VideoInput)
 }
 
-export async function deleteVideo(id: string) {
-    return await request.delete<any,{message:string}>(`/api/v1/videos/${id}`)
+export async function deleteVideo(videoId: string) {
+    return await request.delete<any,{message:string}>(`/api/v1/videos/${videoId}`)
 }
 
 export async function  searchVideoByTitle(title: string,offset?:number,limit?:number) {
@@ -31,4 +31,8 @@ export async function  searchVideoByTitle(title: string,offset?:number,limit?:nu
 
 export async function updateVideoLike(videoId:number) {
     return await request.put<any,{ok:boolean}>(`/api/v1/videos/${videoId}/like`)
+}
+
+export async function getLikeStats(videoId:number) {
+    return await request.get<any,VideoLike>(`/api/v1/videos/${videoId}/like/stats`)
 }

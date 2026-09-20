@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { getVideoById,updateVideoLike,getVideos } from '../../api/video.ts'
+import {getVideoById, updateVideoLike, getVideos, getLikeStats} from '../../api/video.ts'
 import {getCommentsByVideoId,addNewComments} from '../../api/comment.ts'
 import {computed, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from "vue";
-import type {VideoItem,CommentItem} from '../../api/types.ts'
+import type {VideoItem,CommentItem,VideoLike} from '../../api/types.ts'
 import {formatDuration, formatPubdate} from "../../utils/format.ts";
 import {useUiStore} from "../../store/ui.ts";
 import useUserStore from '../../store/user.ts'
@@ -20,6 +20,18 @@ defineProps(['id'])
 const video = ref<VideoItem | null>(null)
 const videos = ref<VideoItem[] | null>(null)
 const comments = ref<CommentItem[]>([])
+const likes = ref<VideoLike>()
+async function loadData(id: string | number) {
+  video.value = await getVideoById(String(id))
+  comments.value = await getCommentsByVideoId(Number(id))
+  likes.value =await getLikeStats(Number(id))
+  if (video.value) {
+    loadFollowState(video.value.author_id)
+    loadFavoriteState(video.value.id)
+  }
+  videos.value=(await getVideos(0, 10))
+}
+
 onMounted(async () => {
   loadData(route.params.id as string)
   ui.collapseBanner()
@@ -36,19 +48,17 @@ onUnmounted(() => {
   window.removeEventListener('pagehide', onPageHide)
   ui.expandBanner() // 等页面拆完再展开顶部 banner
 })
-// ok = true 表示当前已赞
-const ok = ref<boolean>(false)
+// res.ok = true 表示点赞后当前处于已赞状态
 async function updateVL(id: number) {
+  if (likes.value == undefined) {
+    return
+  }
   const res=await updateVideoLike(id)
-  ok.value=res.ok
-  if (ok.value) {
-    if (video.value) {
-      video.value.like_count++
-    }
+  likes.value.is_liked = res.ok
+  if (res.ok) {
+      likes.value.like_count++
   } else {
-    if (video.value) {
-      video.value.like_count--
-    }
+      likes.value.like_count--
   }
 }
 const src = computed(() => video.value?.video_url ?? '')
@@ -132,16 +142,6 @@ async function toggleFavorite() {
   }
 }
 
-async function loadData(id: string | number) {
-  video.value = await getVideoById(String(id))
-  comments.value = await getCommentsByVideoId(Number(id))
-  if (video.value) {
-    loadFollowState(video.value.author_id)
-    loadFavoriteState(video.value.id)
-  }
-  videos.value=(await getVideos(0, 10))
-}
-
 watch(
     () => route.params.id,
     (newId) => {
@@ -217,8 +217,8 @@ function onPageHide() {
           <video ref="videoRef" :src="src" controls @play="onPlay" @pause="onPause"></video>
         </div>
         <div class="video-data">
-          <i class="iconfont icon-dianzan_kuai" :class="{ 'liked': ok }" @click="updateVL(video.id)"></i>
-          <span>{{video.like_count}}</span>
+          <i class="iconfont icon-dianzan_kuai" :class="{ 'liked': likes?.is_liked }" @click="updateVL(video.id)"></i>
+          <span>{{likes?.like_count}}</span>
           <i class="iconfont icon-shoucang" :class="{ 'favorited': isFavorited }" @click="toggleFavorite()"></i>
           <span>{{ favoriteCount }}</span>
         </div>

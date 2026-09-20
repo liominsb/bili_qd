@@ -18,12 +18,16 @@ export interface VideoItem {
     created_at: string
     author_id : number
     video_url: string
-    like_count : number
     author_name: string
     author_image: string
     author_bio: string
     duration : number
     view_count : number
+}
+
+export interface VideoLike {
+    like_count:number
+    is_liked:boolean
 }
 
 export interface VideoInput {
