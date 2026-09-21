@@ -269,7 +269,7 @@ function onPageHide() {
       />
       <div class="author-info">
         <span class="author-name">{{ video.author_name }}</span>
-        <span class="author-bio">{{ video.author_bio }} · {{ followerCount }} 粉丝</span>
+        <span class="author-bio">{{ video.author_bio }}</span>
       </div>
       </div>
       <n-button
@@ -278,7 +278,7 @@ function onPageHide() {
           @click="toggleFollow(video.author_id)"
           style="border-radius: 5px; "
       >
-        {{ isFollowing ? '已关注' : '+ 关注' }}
+        {{ isFollowing ? '已关注' : '+ 关注' }} {{ followerCount }} 粉丝
       </n-button>
       <div class="recommended_videos" v-for="vid in videos" :key="vid.id">
         <n-card :bordered="false" size="small" style="width: 411px; margin-bottom: 10px;">
