@@ -61,7 +61,7 @@ const banners = [
     <div class="home-focus">
       <n-carousel show-arrow style="width: 686px;height: 470px;">
         <div class="slide" v-for="banner in banners" :key="banner.id">
-          <img class="slide-img" :src="banner.pic">
+          <img class="slide-img" :src="banner.pic" alt="">
           <div class="slide-mask"></div>
           <p class="slide-text">{{ banner.title }}</p>
         </div>
