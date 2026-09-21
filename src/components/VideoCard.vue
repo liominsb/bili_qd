@@ -50,6 +50,8 @@ defineProps<{
    父页面 scoped 样式能作用到组件根元素（根节点同时带父子两个 data-v） */
 .video {
   position: relative;   /* 根部扩展位里绝对定位元素的定位上下文 */
+  width:333px;
+  height:263px;
 }
 
 .video .cover {
