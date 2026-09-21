@@ -264,7 +264,7 @@ function onPageHide() {
       <div class="author-wrap">
       <n-avatar
           round
-          :size=48
+          :size="48"
           :src="video.author_image"
       />
       <div class="author-info">
@@ -456,6 +456,15 @@ video {
   display: flex;
   align-items: center;   /* 头像和文本垂直居中对齐 */
   gap: 12px;             /* 头像与文字间距 */
+  min-width: 0;          /* 让这一行可以在 .aside 里收缩，长 bio 才不会撑爆 */
+}
+
+/* 头像作为 flex item 默认 flex-shrink:1，长文本会把它挤扁/挤出画面 */
+.author-wrap :deep(.n-avatar) {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;    /* 兜底：没有图片时也保证是正圆 */
 }
 
 .author-info {
@@ -464,6 +473,10 @@ video {
   flex-direction: column; /* 竖排 */
   gap: 4px;
 
+  /* 关键：flex item 的 min-width 默认是 auto（不能小于内容最小宽度），
+     改成 0 才允许它比内容更窄，里面的省略号才有机会生效 */
+  min-width: 0;
+  flex: 1;               /* 占满头像右侧剩余空间，给 bio 一个确切宽度 */
 }
 
 .author-name {
