@@ -474,6 +474,12 @@ video {
 .author-bio {
   font-size: 13px;
   color: #999;
+  /* 单行省略三件套 */
+  white-space: nowrap;      /* 不换行，否则会被折成多行 */
+  overflow: hidden;         /* 溢出部分裁掉 */
+  text-overflow: ellipsis;  /* 裁掉的地方显示 … */
+
+  max-width: 100%;          /* 兜底，确保它不会反过来把父容器撑宽 */
 }
 
 /* 卡片链接：左右横向布局，设置 10px 间距 */
