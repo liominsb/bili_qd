@@ -281,8 +281,8 @@ function onPageHide() {
         {{ isFollowing ? '已关注' : '+ 关注' }} {{ followerCount }} 粉丝
       </n-button>
       <div class="recommended_videos" v-for="vid in videos" :key="vid.id">
-        <n-card :bordered="false" size="small" style="width: 411px; margin-bottom: 10px;">
-          <router-link :to="`/video/${vid.id}`" class="card-link">
+        <n-card :bordered="false" size="small" content-style="padding: 0;">
+          <router-link :to="`/video/${vid.id}`" class="card-link" style="padding: 10px 0">
             <!-- 1. 左侧封面 -->
             <div class="cover">
               <img :src="vid.pic" alt="视频封面" />
@@ -307,7 +307,7 @@ function onPageHide() {
 <style scoped>
 /* 让整个容器水平垂直居中，占满视口高度 */
 .video {
-  --size:80px;
+  --size:78px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;;
@@ -315,7 +315,7 @@ function onPageHide() {
   gap: 20px;
   min-height: 100vh;
   margin: 0;
-  padding: 0 200px;
+  padding: 0 170px;
   box-sizing: border-box;
 }
 
@@ -329,6 +329,7 @@ function onPageHide() {
   min-width: 300px;         /* 太窄的话给个下限 */
   display: flex;
   flex-direction: column;
+  padding: 0 10px;
 }
 
 .video-title {
@@ -459,6 +460,7 @@ video {
   min-width: 0;          /* 让这一行可以在 .aside 里收缩，长 bio 才不会撑爆 */
 }
 
+
 /* 头像作为 flex item 默认 flex-shrink:1，长文本会把它挤扁/挤出画面 */
 .author-wrap :deep(.n-avatar) {
   flex-shrink: 0;
@@ -468,7 +470,6 @@ video {
 }
 
 .author-info {
-  padding: 10px;
   display: flex;
   flex-direction: column; /* 竖排 */
   gap: 4px;
