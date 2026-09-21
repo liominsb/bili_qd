@@ -95,7 +95,8 @@ async function handleClear() {
   <div class="history">
     <div class="history-head">
       <h2>播放历史</h2>
-      <n-popconfirm v-if="list.length" @positive-click="handleClear">
+      <n-popconfirm v-if="list.length" @positive-click="handleClear"
+                    negative-text="取消" positive-text="确定">
         <template #trigger>
           <n-button size="small">清空历史</n-button>
         </template>
