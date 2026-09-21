@@ -110,6 +110,11 @@ const banners = [
   display: block;
 }
 
+.video {
+  width:333px;
+  height:263px;
+}
+
 /* 底部渐变遮罩：黑 -> 透明，从下往上 */
 .slide-mask {
   position: absolute;
