@@ -45,6 +45,7 @@ onMounted(async function () {
 <style scoped>
 /* 最外层容器 */
 .bilibili-space-header {
+  box-sizing: border-box;
   width: 100%;
   background-color: #fff;
   font-family: system-ui, -apple-system, "Microsoft Yahei", sans-serif;

@@ -142,7 +142,7 @@ async function handleClear() {
 <style scoped>
 .history {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 264px);  /* 卡片宽 264，能放几列放几列 */
+  grid-template-columns: repeat(auto-fill, 290px);  /* 卡片宽 264，能放几列放几列 */
   gap: 20px;
   justify-content: start;
   padding: 20px 0;
@@ -155,7 +155,6 @@ async function handleClear() {
   align-items: center;
   justify-content: space-between;
   padding-bottom: 6px;
-  padding-right: 100px;
 }
 
 .history-head h2 {
@@ -168,8 +167,8 @@ async function handleClear() {
 /* 卡片尺寸归页面管：历史页列宽 264，卡片 264×220
    （组件根已带 position: relative，#extra 插槽里的删除按钮以它定位） */
 .video {
-  width: 264px;
-  height: 220px;
+  width: 290px;
+  height: 235px;
 }
 
 /* 观看进度条：贴在封面最底部（经 #cover 插槽渲染进封面，

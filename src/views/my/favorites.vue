@@ -129,7 +129,7 @@ async function handleUnfavorite(videoId: number) {
 /* 布局照 history：网格放卡片，列宽 264，能放几列放几列 */
 .favorites {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 264px);
+  grid-template-columns: repeat(auto-fill, 290px);
   gap: 20px;
   justify-content: start;
   padding: 20px 0;
@@ -140,7 +140,6 @@ async function handleUnfavorite(videoId: number) {
   display: flex;
   align-items: center;
   padding-bottom: 6px;
-  padding-right: 100px;
 }
 
 .favorites-head h2 {
@@ -154,8 +153,8 @@ async function handleUnfavorite(videoId: number) {
    （.video 是 VideoCard 的根，根节点带父子两个 data-v，页面样式改得到） */
 .video,
 .dead-card {
-  width: 264px;
-  height: 220px;
+  width: 290px;
+  height: 235px;
 }
 
 /* 取消收藏按钮：悬停才出现，平时不打扰 */
