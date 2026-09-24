@@ -2,8 +2,11 @@
 import headerBil from './components/header.vue'
 import LoginModal from './components/auth/Login.vue'
 import useUserStore from './store/user'
+import {useUiStore} from './store/ui.ts'
+import emitter from "./utils/emitter.ts";
 
 const userStore = useUserStore()
+const UiStore = useUiStore()
 if (userStore.token) {
   userStore.fetchMe().catch(() => userStore.logout())
 }
@@ -19,6 +22,11 @@ const themeOverrides = {
     bodyColor: '#f4f5f7',
   },
 }
+
+emitter.on('auth-expired', () => {
+  userStore.logout()
+  UiStore.openLogin()
+})
 </script>
 
 <template>

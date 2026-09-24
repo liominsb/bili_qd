@@ -21,8 +21,11 @@ export const login = (data: LoginReq) =>
 export const register = (data: LoginReq) =>
     request.post<LoginReq , LoginRes>('/api/auth/register', data)
 
+export const logoutApi = () =>
+    request.post<undefined, void>('/api/v1/logout')
+
 export const refreshTokenFuncApi = (data: { access_token:string,refresh_token: string }) =>
-    request.post<{ refreshToken: string }, LoginRes>('/api/auth/refreshTokens', data)
+    request.post<{ refreshToken: string }, {token: string}>('/api/auth/refreshTokens', data)
 
 export const getMyUser = () =>
     request.get<any, UserRes>('/api/v1/users/me')

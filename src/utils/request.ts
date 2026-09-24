@@ -1,6 +1,7 @@
 // src/utils/request.ts
 import axios from 'axios'
 import useUserStore from "../store/user.ts";
+import emitter from "./emitter.ts";
 
 const request = axios.create({
     baseURL: '',
@@ -42,7 +43,7 @@ request.interceptors.response.use(
             // 刷新也失败（refreshToken 过期/被踢）→ 清态跳登录
             localStorage.removeItem('token')
             localStorage.removeItem('refreshToken')
-            window.location.href = '/login'
+            emitter.emit('auth-expired')
             return Promise.reject(error)
         }
     }

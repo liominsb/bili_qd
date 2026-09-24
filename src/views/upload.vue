@@ -123,6 +123,13 @@ function readDuration(file: File) {
     URL.revokeObjectURL(url)  // 用完就释放，不然内存里一直挂着这个 blob
   }
 }
+
+function uploadHeaders(): Record<string, string> {
+  const token = localStorage.getItem('token')
+  return token
+      ? { Authorization: `Bearer ${token}` }
+      : {}
+}
 </script>
 
 <template>
@@ -143,6 +150,7 @@ function readDuration(file: File) {
       <n-upload
           class="upload-box upload-box--img"
           action="/api/v1/upload"
+          :headers="uploadHeaders"
           :max="1"
           accept="image/png,image/jpeg,image/webp"
           @beforeUpload="beforeUpload_img"

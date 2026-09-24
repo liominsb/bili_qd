@@ -52,7 +52,7 @@ function handleDropdownSelect (key:string) {
   }  else if (key === 'editProfile') {
     router.push('/my/edit')
   } else if (key === 'logout') {
-    store.logout()
+    void store.logoutFromServer()
   }
 }
 </script>

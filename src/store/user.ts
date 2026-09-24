@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import {login as loginApi, register as registerApi, getMyUser, updateMyUser, updatePsw, refreshTokenFuncApi} from '../api/user'
+import {login as loginApi, register as registerApi, logoutApi, getMyUser, updateMyUser, updatePsw, refreshTokenFuncApi} from '../api/user'
 import { getFollowStats } from '../api/follow'
 import type { User,psw } from '../api/types'
 
@@ -77,6 +77,16 @@ const useUserStore = defineStore('user', () => {
         followNum.value = 0
     }
 
+    const logoutFromServer = async () => {
+        try {
+            await logoutApi()
+        } catch (err) {
+            console.error('服务端注销失败:', err)
+        } finally {
+            logout()
+        }
+    }
+
     const updateMyUserinfo = async (data: User) => {
         await updateMyUser(data)
         setUser(data)
@@ -90,7 +100,7 @@ const useUserStore = defineStore('user', () => {
     const refreshTokenFunc = async () => {
         if (!localStorage.getItem('refreshToken')) return
         const res = await refreshTokenFuncApi({ access_token: localStorage.getItem('token')||'', refresh_token: localStorage.getItem('refreshToken')||'' })
-        setToken(res.token, res.refreshToken)
+        setToken(res.token,refreshToken.value)
     }
 
     const loginWithTokens = async function (t: string, rt: string) {
@@ -98,7 +108,7 @@ const useUserStore = defineStore('user', () => {
         await fetchMe()
     }
 
-    return { token, refreshToken, id, name, bio, image, followNum, fansNum, isLogin, login, fetchMe, logout,register, updateMyUserinfo, updateMyPassword,refreshTokenFunc, fetchFollowStats,loginWithTokens }
+    return { token, refreshToken, id, name, bio, image, followNum, fansNum, isLogin, login, fetchMe, logout, logoutFromServer,register, updateMyUserinfo, updateMyPassword,refreshTokenFunc, fetchFollowStats,loginWithTokens }
 })
 
 export default useUserStore
