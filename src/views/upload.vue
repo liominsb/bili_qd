@@ -176,6 +176,7 @@ function uploadHeaders(): Record<string, string> {
           multiple
           directory-dnd
           action="/api/v1/upload"
+          :headers="uploadHeaders"
           :max="1"
           accept="video/mp4"
           @beforeUpload="beforeUpload_video"
