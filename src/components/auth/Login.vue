@@ -1,22 +1,14 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import useUiStore from '../../store/ui'
-import {NInput, NButton, NForm, NFormItem, NConfigProvider, useMessage} from 'naive-ui'
+import {NInput, NButton, NForm, useMessage} from 'naive-ui'
 const ui = useUiStore()
 import useUserStore from '../../store/user'
 const userStore = useUserStore()
 const message = useMessage()
 // 表单数据,双向绑定到下面的 input
-const form = reactive({ username: '', password: '' })
-
-const themeOverrides = {
-  common: {
-    primaryColor: '#23ade5',
-    primaryColorHover: '#3db9e8',
-    primaryColorPressed: '#1f9ad0',
-    primaryColorSuppl: '#3db9e8',
-  },
-}
+const loginform = reactive({ username: '', password: '' })
+const registerform = reactive({ username: '', password1: '',password2: '' })
 
 // 统一关闭入口:点 × / 点遮罩 / 按 Esc 都调它
 const close = () => ui.closeLogin()
@@ -24,8 +16,11 @@ const close = () => ui.closeLogin()
 // 提交登录
 const handleLogin = async () => {
   try {
-    if (!form.username || !form.password) return
-    await userStore.login(form)
+    if (!loginform.username || !loginform.password) {
+      message.warning('请输入完整')
+      return
+    }
+    await userStore.login(loginform)
     ui.closeLogin()
   }
   catch (err) {
@@ -34,8 +29,18 @@ const handleLogin = async () => {
 }
 const handleRegister = async () => {
   try {
-    if (!form.username || !form.password) return
-    await userStore.register(form)
+    if (!registerform.username || !registerform.password1 || !registerform.password2){
+      message.warning('请输入完整')
+      return
+    }
+    if (registerform.password1 != registerform.password2) {
+      message.warning('两次输入的密码不一致')
+      return
+    }
+    await userStore.register({
+      username: registerform.username,
+      password: registerform.password1,
+    })
     ui.closeLogin()
   }
   catch (err) {
@@ -51,71 +56,60 @@ const handleGithubLogin = function () {
 </script>
 
 <template>
-  <Teleport to="body">
-    <Transition name="modal">
-      <div v-if="ui.loginVisible" class="backdrop" @click.self="close">
-        <!-- 主题覆盖只包住弹窗，不影响全站其他组件 -->
-        <n-config-provider :theme-overrides="themeOverrides">
-          <div class="dialog">
-            <button class="close" @click="close">×</button>
-            <h3>登录</h3>
-            <n-form :model="form" label-placement="left" :label-width="40" @submit.prevent>
-              <n-form-item label="账号" path="username">
-                <n-input
-                    v-model:value="form.username"
-                    type="text" placeholder="请输入账号"
-                    @keydown.enter.prevent="handleLogin"/>
-              </n-form-item>
-              <n-form-item label="密码" path="password">
-                <n-input
-                    v-model:value="form.password"
-                    type="password"
-                    show-password-on="mousedown"
-                    placeholder="请输入密码"
-                    @keydown.enter.prevent="handleLogin"/>
-              </n-form-item>
-              <div class="btn-row">
-                <n-button attr-type="button" ghost block class="submit" @click="handleRegister">注册</n-button>
-                <n-button attr-type="button" type="primary" block class="submit" @click="handleLogin">登录</n-button>
-              </div>
-            </n-form>
-
-            <!-- 第三方登录：和上面的账号密码登录是两条独立的路 -->
-            <div class="oauth-divider">其他登录方式</div>
-            <n-button attr-type="button" block class="github-btn" @click="handleGithubLogin">
-              <i class="iconfont icon-GitHub" style="padding: 10px"></i>
-              使用 GitHub 登录
-            </n-button>
-          </div>
-        </n-config-provider>
-      </div>
-    </Transition>
-  </Teleport>
+  <n-modal v-model:show="ui.loginVisible">
+            <n-card  style="width: 420px;">
+              <button class="close" @click="close">×</button>
+              <n-tabs
+                  class="card-tabs"
+                  default-value="signin"
+                  size="large"
+                  animated
+                  pane-wrapper-style="margin: 0 -4px"
+                  pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
+              >
+                <n-tab-pane name="signin" tab="登录"  @keydown.enter.prevent="handleLogin">
+                  <n-form :model="loginform">
+                    <n-form-item-row label="用户名">
+                      <n-input v-model:value="loginform.username" placeholder="请输入用户名"/>
+                    </n-form-item-row>
+                    <n-form-item-row label="密码 ">
+                      <n-input v-model:value="loginform.password" placeholder="请输入密码" type="password"/>
+                    </n-form-item-row>
+                  </n-form>
+                  <n-button @click="handleLogin" type="primary" block secondary strong>
+                    登录
+                  </n-button>
+                </n-tab-pane>
+                <n-tab-pane name="signup" tab="注册" @keydown.enter.prevent="handleRegister()">
+                  <n-form :model="registerform">
+                    <n-form-item-row label="用户名">
+                      <n-input v-model:value="registerform.username" placeholder="请输入用户名"/>
+                    </n-form-item-row>
+                    <n-form-item-row label="密码">
+                      <n-input v-model:value="registerform.password1" placeholder="请输入密码" type="password"/>
+                    </n-form-item-row>
+                    <n-form-item-row label="重复密码">
+                      <n-input v-model:value="registerform.password2" placeholder="请再次输入密码" type="password"/>
+                    </n-form-item-row>
+                  </n-form>
+                  <n-button @click="handleRegister" type="primary" block secondary strong>
+                    注册
+                  </n-button>
+                </n-tab-pane>
+              </n-tabs>
+              <!-- 第三方登录：和上面的账号密码登录是两条独立的路 -->
+              <n-divider style="font-size: 12px; margin: 18px 0 12px;color: #999999">
+                其他登录方式
+              </n-divider>
+              <n-button attr-type="button" block @click="handleGithubLogin">
+                <i class="iconfont icon-GitHub" style="padding: 10px"></i>
+                使用 GitHub 登录
+              </n-button>
+            </n-card>
+  </n-modal>
 </template>
 
 <style scoped>
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.dialog {
-  position: relative;
-  width: 320px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-}
-.dialog h3 {
-  margin: 0 0 16px;
-  text-align: center;
-  color: #333;
-}
 .close {
   position: absolute;
   top: 12px;
@@ -126,52 +120,6 @@ const handleGithubLogin = function () {
   color: #999;
   cursor: pointer;
 }
-/* 按钮行：横向并排，中间留 12px 间隙 */
-.btn-row {
-  display: flex;
-  gap: 12px;
-  margin-top: 4px;
-}
-/* 两个按钮等分宽度；block 让内部填满 */
-.submit {
-  flex: 1;
-}
 
-/* 分割线：中间是文字，两侧各有一条自动撑开的细线 */
-.oauth-divider {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 18px 0 12px;
-  font-size: 12px;
-  color: #999;
-  white-space: nowrap;
-}
-/* ::before / ::after 是两个「伪元素」，不需要在模板里写标签就能凭空生成两个盒子。
-   它们参与 flex 布局，flex: 1 让两者平分所有剩余空间 —— 文字自然被挤在正中间。 */
-.oauth-divider::before,
-.oauth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #ececec;
-}
-.github-btn {
-  font-size: 13px;
-}
 
-/* Transition 动画:淡入 + 轻微放大 */
-.modal-enter-from .dialog,
-.modal-leave-to .dialog {
-  transform: scale(0.92);
-  opacity: 0;
-}
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.2s;
-}
-.modal-enter-active .dialog,
-.modal-leave-active .dialog {
-  transition: transform 0.2s, opacity 0.2s;
-}
 </style>
