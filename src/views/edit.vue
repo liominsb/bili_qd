@@ -6,7 +6,7 @@ import {
   NResult, NSkeleton, useMessage,
 } from 'naive-ui'
 import type { FormInst, FormRules } from 'naive-ui'
-import { PersonOutline, ShieldCheckmarkOutline } from '@vicons/ionicons5'
+import { PersonOutline } from '@vicons/ionicons5'
 import useUserStore from '../store/user.ts'
 import useUiStore from '../store/ui.ts'
 import type { psw, User } from '../api/types.ts'
