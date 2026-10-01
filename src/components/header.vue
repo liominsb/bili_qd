@@ -245,6 +245,7 @@ function handleDropdownSelect (key:string) {
 }
 
 .banner-box {
+  position: relative;
   width: 100%;
   height: auto;
 }
@@ -254,13 +255,13 @@ function handleDropdownSelect (key:string) {
   display: block;
   object-fit: cover;
 }
+
 .banner-logo {
   position: absolute;
-  left: 90px;
-  top: 80px;
-  bottom: 8px;
-  width: 170px;         /* 原图 220x105，等比缩放后约 81px 高 */
-  pointer-events: none; /* 不挡 banner 点击 */
+  left: 4.4%;
+  top: 41.7%;
+  width: 8.3%;
+  pointer-events: none;
 }
 
 .banner-box.collapsed .banner-logo {

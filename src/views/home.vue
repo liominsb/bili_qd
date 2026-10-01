@@ -59,7 +59,7 @@ const banners = [
 <template>
   <div class="home">
     <div class="home-focus">
-      <n-carousel show-arrow style="width: 686px;height: 470px;">
+      <n-carousel show-arrow class="home-carousel">
         <div class="slide" v-for="banner in banners" :key="banner.id">
           <img class="slide-img" :src="banner.pic" alt="">
           <div class="slide-mask"></div>
@@ -86,16 +86,48 @@ const banners = [
 <style scoped>
 .home {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 333px);  /* 列宽=卡片宽，容器能放几列放几列 */
-  gap: 20px;                                    /* 行距40 列距20，和原来一致 */
-  justify-content: center;                           /* 整个网格在容器内居中 */
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 20px;
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1985px;
+  margin: 0 auto;
   padding: 40px 120px;
+
+  container-type: inline-size;
+}
+.home-focus {
+  /* 内容宽度减去四个间距，再分成五列 */
+  --card-width: calc((100cqw - 80px) / 5);
+
+  /* 标题、作者及其间距的总高度 */
+  --info-height: 70px;
+
+  grid-column: span 2;
+  grid-row: span 2;
+
+  position: relative;
+  width: 100%;
+  min-width: 0;
+
+  /* 两张封面 + 第一行文字区 + 行间距 */
+  height: calc(
+      var(--card-width) * 9 / 8
+      + var(--info-height)
+      + 20px
+  );
+
+  align-self: start;
 }
 
-.home-focus {
-  grid-column: span 2;   /* 横向占 2 列 → 333×2 + 20 = 686px */
-  grid-row: span 2;      /* 纵向占 2 行 → 262×2 + 20 = 544px */
+.home-focus > .home-carousel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
+
 
 .slide {
   position: relative;
@@ -110,9 +142,15 @@ const banners = [
   display: block;
 }
 
-.video {
-  width:333px;
-  height:263px;
+.home > .video {
+  width: 100%;
+  min-width: 0;
+  height: auto;
+}
+
+/* 新增：每张卡片的标题都预留两行高度 */
+.home > .video :deep(h4) {
+  height: 40px;
 }
 
 /* 底部渐变遮罩：黑 -> 透明，从下往上 */

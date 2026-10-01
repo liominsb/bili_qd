@@ -320,8 +320,9 @@ function onPageHide() {
 }
 
 .main {
-  width: calc(var(--size) * 16);   /* 视频原来多宽，左栏就多宽 */
-  flex-shrink: 0;                  /* 禁止被压缩 */
+  width: calc(var(--size) * 16);
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .aside {
@@ -355,9 +356,10 @@ function onPageHide() {
 
 /* 视频固定宽高（16:9 示例），并居中 */
 video {
-  width: calc(var(--size) * 16);
-  height: calc(var(--size) * 9);
-  background: #000; /* 加载时黑色背景 */
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
   display: block;
 }
 
@@ -458,6 +460,7 @@ video {
   align-items: center;   /* 头像和文本垂直居中对齐 */
   gap: 12px;             /* 头像与文字间距 */
   min-width: 0;          /* 让这一行可以在 .aside 里收缩，长 bio 才不会撑爆 */
+  height: 62px;
 }
 
 
