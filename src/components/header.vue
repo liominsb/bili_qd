@@ -50,7 +50,7 @@ function handleDropdownSelect (key:string) {
     ui.openLogin()
     router.push('/my')
   }  else if (key === 'editProfile') {
-    router.push('/my/edit')
+    router.push('/edit')
   } else if (key === 'logout') {
     void store.logoutFromServer()
   }

@@ -24,10 +24,6 @@ const router=createRouter(
                 component:My,
                 children:[
                     {
-                        path:'edit',
-                        component:()=> import('../views/my/edit.vue')
-                    },
-                    {
                         path:'History',
                         component: ()=> import('../views/my/history.vue')
                     },
@@ -61,6 +57,11 @@ const router=createRouter(
                     }
                     return true
                 }
+            },
+            {
+                path:'/edit',
+                name:'edit',
+                component:()=> import('../views/edit.vue')
             },
             {
                 path: '/search',

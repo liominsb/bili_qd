@@ -2,7 +2,9 @@
 import useUserStore from '../../store/user.ts'
 import { NAvatar,NDivider } from 'naive-ui'
 import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 const userStore = useUserStore()
+const route = useRoute()
 
 onMounted(async function () {
     await userStore.fetchFollowStats()
@@ -10,7 +12,7 @@ onMounted(async function () {
 </script>
 
 <template>
-    <div class="bilibili-space-header">
+    <div class="bilibili-space-header" :class="{ 'profile-edit-space': route.path === '/my/edit' }">
       <!-- 顶部行：左头像昵称 + 右数据统计 并排 -->
       <div class="header-top-row">
         <div class="user-info-wrap">
@@ -37,7 +39,7 @@ onMounted(async function () {
         </div>
       </div>
 
-      <n-divider style="margin-top: -16px;"/>
+      <n-divider class="space-divider"/>
       <router-view></router-view>
     </div>
 </template>
@@ -96,5 +98,102 @@ onMounted(async function () {
 .nav-tab-bar {
   padding: 12px 24px;
   border-bottom: 1px solid #e3e5e7;
+}
+
+.space-divider {
+  margin-top: -16px;
+}
+
+/* 资料设置页与表单共用居中的内容宽度。 */
+.profile-edit-space {
+  min-height: calc(100vh - 64px);
+  padding: 32px 24px 56px;
+  background: #f4f5f7;
+}
+
+.profile-edit-space .header-top-row {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 0 24px;
+  gap: 24px;
+}
+
+.profile-edit-space .user-info-wrap {
+  flex: 1;
+  min-width: 0;
+  gap: 16px;
+}
+
+.profile-edit-space .name-bio-box {
+  min-width: 0;
+  gap: 8px;
+}
+
+.profile-edit-space .name-line {
+  flex-wrap: wrap;
+}
+
+.profile-edit-space .username,
+.profile-edit-space .bio {
+  overflow-wrap: anywhere;
+}
+
+.profile-edit-space .username {
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.profile-edit-space .bio {
+  color: #777d87;
+  line-height: 1.6;
+}
+
+.profile-edit-space .level-tag,
+.profile-edit-space .vip-tag {
+  flex-shrink: 0;
+}
+
+.profile-edit-space .data-stat-wrap {
+  flex-shrink: 0;
+  gap: 32px;
+  padding-right: 0;
+}
+
+.profile-edit-space .space-divider {
+  max-width: 960px;
+  margin: 0 auto 28px;
+}
+
+@media (max-width: 640px) {
+  .profile-edit-space {
+    padding: 24px 16px 36px;
+  }
+
+  .profile-edit-space .header-top-row {
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-bottom: 20px;
+  }
+
+  .profile-edit-space .user-info-wrap {
+    flex-basis: 100%;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .profile-edit-space .username {
+    font-size: 21px;
+  }
+
+  .profile-edit-space .data-stat-wrap {
+    padding-left: 76px;
+    gap: 28px;
+  }
+
+  .profile-edit-space .space-divider {
+    margin-bottom: 24px;
+  }
 }
 </style>
