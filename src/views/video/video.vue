@@ -319,13 +319,12 @@ function onPageHide() {
 }
 
 .main {
-  flex-shrink: 1;
+  flex: 1;
   min-width: 0;
 }
 
 .aside {
-  flex: 1;                  /* 占据剩余全部宽度 */
-  min-width: 300px;         /* 太窄的话给个下限 */
+  flex: 0 0 400px;
   display: flex;
   flex-direction: column;
   padding: 0 10px;
