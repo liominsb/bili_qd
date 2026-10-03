@@ -307,7 +307,6 @@ function onPageHide() {
 <style scoped>
 /* 让整个容器水平垂直居中，占满视口高度 */
 .video {
-  --size:78px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;;
@@ -320,7 +319,6 @@ function onPageHide() {
 }
 
 .main {
-  width: calc(var(--size) * 16);
   flex-shrink: 1;
   min-width: 0;
 }
@@ -363,16 +361,12 @@ video {
   display: block;
 }
 
-.n-space {
-  width: calc(var(--size) * 16);
-}
-
 .n-input {
   width: 100%;
 
 }
 .video-text {
-  width: calc(var(--size) * 16);
+  width: 100%;
   display: flex;
   justify-content: space-between; /* 两端对齐 */
   align-items: center; /* 垂直居中 */
@@ -427,8 +421,8 @@ video {
 }
 
 .comment {
-  --size:60px;
-  width: calc(var(--size) * 16);
+  width: 100%;
+  box-sizing: border-box;
   padding: 20px 0 0 20px;
 }
 
