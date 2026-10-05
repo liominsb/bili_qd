@@ -22,7 +22,12 @@ const router=createRouter(
             {
                 path:'/my',
                 component:My,
+                redirect:'/my/videos',
                 children:[
+                    {
+                        path:'videos',
+                        component: ()=> import('../views/my/videos.vue')
+                    },
                     {
                         path:'History',
                         component: ()=> import('../views/my/history.vue')

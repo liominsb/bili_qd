@@ -7,6 +7,11 @@ export async function getVideos(offset: number, limit: number): Promise<VideoIte
     return res.videos
 }
 
+export async function getMyVideos(offset: number, limit: number): Promise<VideoItem[]> {
+    const res = await request.get<any, { videos: VideoItem[] }>('/api/v1/users/me/videos', { params: { offset, limit } })
+    return res.videos
+}
+
 export async function getVideoById(videoId: string): Promise<VideoItem> {
     const res = await request.get<any, { video: VideoItem }>(`/api/v1/videos/${videoId}`)
     return res.video

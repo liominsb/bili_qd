@@ -4,12 +4,15 @@ import type {VideoItem} from "../api/types.ts";
 import {onMounted, onUnmounted, ref} from "vue";
 import {formatPubdate} from "../utils/format.ts";
 import VideoCard from "../components/VideoCard.vue";
+import {useLoadingBar} from 'naive-ui'
 
+const loadingBar = useLoadingBar()
 const videos = ref<VideoItem[]>([])
 const offset = ref(0)          // 当前已加载到第几条，下一页从这里开始
 const limit = 20
 const loading = ref(false)     // 请求进行中，防止重复触发
 const hasMore = ref(true)      // 后端还有没有更多数据
+const refreshing = ref(false)
 
 // 加载一页数据：offset 累加，结果拼到已有列表后面
 async function loadMore() {
@@ -30,6 +33,26 @@ async function loadMore() {
   }
 }
 
+async function refreshVideos() {
+  if (loading.value) return
+  loading.value = true
+  refreshing.value = true
+  loadingBar.start()
+  try {
+    const list = await getVideos(0, limit)
+    videos.value = list
+    offset.value = list.length
+    hasMore.value = list.length === limit
+    if (refreshing.value) loadingBar.finish()
+  } catch (error) {
+    console.error('刷新推荐视频失败:', error)
+    if (refreshing.value) loadingBar.error()
+  } finally {
+    loading.value = false
+    refreshing.value = false
+  }
+}
+
 function onScroll() {
   const scrollBottom = window.scrollY + window.innerHeight
   const docHeight = document.documentElement.scrollHeight
@@ -46,6 +69,10 @@ onMounted(function () {
 
 onUnmounted(function () {
   window.removeEventListener('scroll', onScroll)
+  if (refreshing.value) {
+    loadingBar.finish()
+    refreshing.value = false
+  }
 })
 
 const banners = [
@@ -58,6 +85,18 @@ const banners = [
 
 <template>
   <div class="home">
+    <n-button
+      class="refresh-button"
+      :loading="refreshing"
+      :disabled="loading"
+      @click="refreshVideos"
+    >
+      <template #icon>
+        <i class="iconfont icon-shuaxin" aria-hidden="true"></i>
+      </template>
+      <span class="refresh-text">换一换</span>
+    </n-button>
+
     <div class="home-focus">
       <n-carousel show-arrow class="home-carousel">
         <div class="slide" v-for="banner in banners" :key="banner.id">
@@ -68,6 +107,17 @@ const banners = [
       </n-carousel>
     </div>
 
+    <template v-if="loading && !videos.length">
+      <div v-for="index in 6" :key="index" class="video-skeleton" aria-hidden="true">
+        <n-skeleton class="skeleton-cover" height="auto" :sharp="false" />
+        <div class="skeleton-title">
+          <n-skeleton height="16px" :sharp="false" />
+          <n-skeleton height="16px" width="70%" :sharp="false" />
+        </div>
+        <n-skeleton class="skeleton-meta" height="14px" width="45%" :sharp="false" />
+      </div>
+    </template>
+
     <VideoCard
       v-for="video in videos"
       :key="video.id"
@@ -77,7 +127,7 @@ const banners = [
     />
     <!-- 底部哨兵：横跨整行，进入视口就触发加载 -->
     <div class="load-more">
-      <p v-if="loading">加载中...</p>
+      <p v-if="loading && videos.length">加载中...</p>
       <p v-else-if="!hasMore">没有更多了</p>
     </div>
   </div>
@@ -85,6 +135,7 @@ const banners = [
 
 <style scoped>
 .home {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 20px;
@@ -97,6 +148,30 @@ const banners = [
 
   container-type: inline-size;
 }
+
+.refresh-button {
+  position: absolute;
+  top: 40px;
+  right: 70px;
+  width: 40px;
+  height: 80px;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+  border-radius: 8px;
+}
+
+.refresh-button :deep(.n-button__icon) {
+  margin: 0;
+}
+
+.refresh-text {
+  writing-mode: vertical-rl;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+}
+
 .home-focus {
   /* 内容宽度减去四个间距，再分成五列 */
   --card-width: calc((100cqw - 80px) / 5);
@@ -151,6 +226,25 @@ const banners = [
 /* 新增：每张卡片的标题都预留两行高度 */
 .home > .video :deep(h4) {
   height: 40px;
+}
+
+.video-skeleton {
+  min-width: 0;
+}
+
+.skeleton-cover {
+  aspect-ratio: 16 / 9;
+}
+
+.skeleton-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.skeleton-meta {
+  margin-top: 4px;
 }
 
 /* 底部渐变遮罩：黑 -> 透明，从下往上 */

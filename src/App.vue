@@ -36,10 +36,12 @@ emitter.on('auth-expired', () => {
       <div class="header-wrapper">
         <headerBil />
       </div>
-      <n-message-provider :closable="true">
-        <router-view></router-view>
-        <LoginModal/>
-      </n-message-provider>
+      <n-loading-bar-provider>
+        <n-message-provider :closable="true">
+          <router-view></router-view>
+          <LoginModal/>
+        </n-message-provider>
+      </n-loading-bar-provider>
     </n-config-provider>
   </div>
 </template>

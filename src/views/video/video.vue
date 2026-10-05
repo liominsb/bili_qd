@@ -21,9 +21,18 @@ const video = ref<VideoItem | null>(null)
 const videos = ref<VideoItem[] | null>(null)
 const comments = ref<CommentItem[]>([])
 const likes = ref<VideoLike>()
+let commentRequestId = 0
+
+async function loadComments(videoId: number) {
+  if (Number(route.params.id) !== videoId) return
+  const requestId = ++commentRequestId
+  const items = await getCommentsByVideoId(videoId)
+  if (requestId === commentRequestId && Number(route.params.id) === videoId) comments.value = items
+}
+
 async function loadData(id: string | number) {
   video.value = await getVideoById(String(id))
-  comments.value = await getCommentsByVideoId(Number(id))
+  await loadComments(Number(id))
   likes.value =await getLikeStats(Number(id))
   if (video.value) {
     loadFollowState(video.value.author_id)
@@ -64,15 +73,27 @@ async function updateVL(id: number) {
 const src = computed(() => video.value?.video_url ?? '')
 
 const value = ref<string>("")
+const submitting = ref(false)
 
 async function handleSubmit() {
+  const videoId = video.value?.id
+  if (!videoId || Number(route.params.id) !== videoId || submitting.value) return
+  submitting.value = true
   try {
-    const res = await addNewComments({ content: value.value, parent_id: 0 }, video.value?.id as number)
+    const res = await addNewComments({ content: value.value, parent_id: 0 }, videoId)
     message.success(res.message)
+    if (Number(route.params.id) !== videoId) return
     value.value = ''
+    try {
+      await loadComments(videoId)
+    } catch {
+      message.warning('评论已发布，刷新列表失败，请刷新页面查看')
+    }
   } catch (err) {
     // err 就是拦截器抛出来的 Error，.message 是后端返回的错误信息
     message.error(err instanceof Error ? err.message : '发表失败')
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -230,13 +251,14 @@ function onPageHide() {
             <span>|</span>
             <span>最新</span>
           </h1>
-          <n-button type="info" @click="handleSubmit">
+          <n-button type="info" :loading="submitting" :disabled="submitting" @click="handleSubmit">
             发布
           </n-button>
         </div>
         <n-space vertical>
           <n-input
               v-model:value="value"
+              :disabled="submitting"
               type="textarea"
               placeholder="千山万水总是情，写个评论行不行"
               size="medium"
@@ -388,8 +410,17 @@ video {
   margin-left: 10px;
 }
 
+/* 点赞/收藏那一行：横向排列 + 垂直居中对齐（原来图标和数字是 inline，对齐靠基线） */
+.video-data {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
 .icon-dianzan_kuai {          /* 选择器：选中 class 为 "icon-dianzan_kuai" 的元素 */
-  font-size: 24px;       /* 图标大小：24 像素（因为它是字体图标） */
+  font-size: 36px;
   color: #999;           /* 图标颜色：中灰色 #999 */
   cursor: pointer;       /* 鼠标悬停时显示"小手"光标，提示可点击 */
   transition: color .2s; /* 颜色变化时，用 0.2 秒平滑过渡，而不是瞬间变 */
@@ -400,15 +431,8 @@ video {
   color: #fb7299;
 }
 
-/* 点赞/收藏那一行：横向排列 + 垂直居中对齐（原来图标和数字是 inline，对齐靠基线） */
-.video-data {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .icon-shoucang {
-  font-size: 24px;
+  font-size: 36px;
   color: #999;
   cursor: pointer;
   transition: color .2s;
