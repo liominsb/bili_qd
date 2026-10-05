@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { getHistory, deleteHistory, clearHistory } from '../../api/history.ts'
 import type { HistoryItem } from '../../api/types.ts'
 import VideoCard from '../../components/VideoCard.vue'
+import VideoDeleteButton from '../../components/VideoDeleteButton.vue'
 import { useMessage } from 'naive-ui'
 import dayjs from 'dayjs'
 
@@ -124,7 +125,7 @@ async function handleClear() {
             positive-text="确定"
         >
           <template #trigger>
-            <n-button class="del-btn">×</n-button>
+            <VideoDeleteButton />
           </template>
           <p>确定要删除这条记录吗？</p>
         </n-popconfirm>
@@ -190,32 +191,6 @@ async function handleClear() {
   height: 100%;
   background: #00aeec;
   transition: width .2s ease;
-}
-
-/* 删除按钮：悬停才出现，平时不打扰 */
-.del-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.56);
-  color: #000000;
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity .2s ease;
-}
-
-.video:hover .del-btn {
-  opacity: 1;
 }
 
 .load-more {

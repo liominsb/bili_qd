@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { getMyFavorites, unfavoriteVideo } from '../../api/favorite.ts'
 import type { FavoriteItem } from '../../api/types.ts'
 import VideoCard from '../../components/VideoCard.vue'
+import VideoDeleteButton from '../../components/VideoDeleteButton.vue'
 import { useMessage } from 'naive-ui'
 import dayjs from 'dayjs'
 
@@ -96,7 +97,7 @@ async function handleUnfavorite(videoId: number) {
               positive-text="确定"
           >
             <template #trigger>
-              <n-button class="del-btn">×</n-button>
+              <VideoDeleteButton />
             </template>
               <p>确定要取消收藏吗？</p>
           </n-popconfirm>
@@ -155,32 +156,6 @@ async function handleUnfavorite(videoId: number) {
 .dead-card {
   width: 290px;
   height: 235px;
-}
-
-/* 取消收藏按钮：悬停才出现，平时不打扰 */
-.del-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.56);
-  color: #000000;
-  font-size: 15px;
-  line-height: 1;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity .2s ease;
-}
-
-.video:hover .del-btn {
-  opacity: 1;
 }
 
 /* ===== 失效视频灰卡片（页面独有，不进 VideoCard 组件） ===== */
