@@ -4,6 +4,11 @@ import {useRouter} from "vue-router";
 import {NAvatar, NButton, NDropdown} from 'naive-ui'
 import {useUiStore} from '../store/ui.ts'
 import useUserStore from "../store/user.ts";
+import {formatDuration} from "../utils/format.ts";
+import {getMyFavorites} from "../api/favorite.ts";
+import {getHistory} from "../api/history.ts";
+import type {FavoriteItem, HistoryItem} from "../api/types.ts";
+
 const ui = useUiStore()
 const store = useUserStore()
 const isScrolled = ref(false)
@@ -55,6 +60,19 @@ function handleDropdownSelect (key:string) {
     void store.logoutFromServer()
   }
 }
+
+const videos = ref<FavoriteItem[] | null>(null)
+async function favoriteVideosShow (show: boolean) {
+  if (!show) return
+  videos.value=(await getMyFavorites(0, 10))
+}
+
+const historyVideos = ref<HistoryItem[] | null>(null)
+async function historyVideosShow(show: boolean) {
+  if (!show) return
+  historyVideos.value = await getHistory(0, 10)
+}
+
 </script>
 
 <template>
@@ -86,14 +104,98 @@ function handleDropdownSelect (key:string) {
           <i class="iconfont icon-fengche"></i>
           <span>动态</span>
         </router-link>
-        <router-link to="/my/favorites" class="nav-item">
-          <i class="iconfont icon-shoucang1"></i>
-          <span>收藏</span>
-        </router-link>
-        <router-link to="/my/history" class="nav-item">
-          <i class="iconfont icon-zhongbiao"></i>
-          <span>历史</span>
-        </router-link>
+        <n-popover
+            trigger="hover"
+            placement="bottom-end"
+            :width="360"
+            style="padding: 0; max-width: calc(100vw - 24px);"
+            @update:show="favoriteVideosShow"
+        >
+          <template #trigger>
+            <router-link to="/my/favorites" class="nav-item">
+              <i class="iconfont icon-shoucang1"></i>
+              <span>收藏</span>
+            </router-link>
+          </template>
+          <n-card
+              class="popover-panel"
+              size="small"
+              :bordered="false"
+              content-style="padding: 0;"
+          >
+            <div class="popover-list">
+              <div class="video-item" v-for="vid in videos" :key="vid.video_id">
+                <router-link :to="`/video/${vid.video_id}`" class="card-link" v-if="!vid.deleted_at">
+                  <div class="cover">
+                    <img :src="vid.pic" alt="视频封面" />
+                    <span class="cover-time">{{ formatDuration(vid.duration) }}</span>
+                  </div>
+                  <div class="video-info">
+                    <h4 class="title">{{ vid.title }}</h4>
+                    <div class="author">{{ vid.author_name }}</div>
+                    <div class="meta">
+                      <i class="iconfont icon-shipin1"></i>
+                      <span>{{ vid.view_count }}</span>
+                    </div>
+                  </div>
+                </router-link>
+                <!-- 失效视频保留收藏信息，不跳转详情 -->
+                <div v-else class="card-link dead-card">
+                  <div class="cover dead-cover">
+                    <img :src="vid.pic" :alt="vid.title" />
+                    <div class="dead-mask">视频已失效</div>
+                  </div>
+
+                  <div class="video-info">
+                    <h4 class="title">{{ vid.title }}</h4>
+                    <div class="dead-meta">稿件已删除</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <router-link to="/my/favorites" class="popover-footer">查看全部</router-link>
+          </n-card>
+        </n-popover>
+        <n-popover
+            trigger="hover"
+            placement="bottom-end"
+            :width="360"
+            style="padding: 0; max-width: calc(100vw - 24px);"
+            @update:show="historyVideosShow"
+        >
+          <template #trigger>
+            <router-link to="/my/history" class="nav-item">
+              <i class="iconfont icon-zhongbiao"></i>
+              <span>历史</span>
+            </router-link>
+          </template>
+          <n-card
+              class="popover-panel"
+              size="small"
+              :bordered="false"
+              content-style="padding: 0;"
+          >
+            <div class="popover-list">
+              <div class="video-item" v-for="vid in historyVideos" :key="vid.video_id">
+                <router-link :to="`/video/${vid.video_id}`" class="card-link">
+                  <div class="cover">
+                    <img :src="vid.pic" alt="视频封面" />
+                    <span class="cover-time">{{ formatDuration(vid.duration) }}</span>
+                  </div>
+                  <div class="video-info">
+                    <h4 class="title">{{ vid.title }}</h4>
+                    <div class="author">{{ vid.author_name }}</div>
+                    <div class="meta">
+                      <i class="iconfont icon-shipin1"></i>
+                      <span>{{ vid.view_count }}</span>
+                    </div>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+            <router-link to="/my/history" class="popover-footer">查看全部</router-link>
+          </n-card>
+        </n-popover>
         <button @click="pushupload" style="cursor: pointer;color: #ffffff; background-color: #fb7299; border: none; height: 34px;width: 90px;border-radius: 6px;">
           <i class="iconfont icon-tougaox" style="font-size: 16px; color: #ffffff;padding: 0 6px 0 0"></i>
           <span style="font-weight: 450">投稿</span>
@@ -305,5 +407,165 @@ i{
 .banner-box.collapsed img {
   height: 60px;
   object-fit: cover;
+}
+
+/* 收藏和历史共用弹窗样式 */
+.popover-panel {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.popover-list {
+  padding: 8px;
+  max-height: min(420px, calc(100vh - 144px));
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.popover-footer {
+  display: block;
+  padding: 12px;
+  border-top: 1px solid #eee;
+  color: #23ade5;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.video-item + .video-item {
+  margin-top: 4px;
+}
+
+/* 视频条目：左侧封面，右侧信息 */
+.card-link {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  color: #18191c;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+a.card-link:hover,
+.popover-footer:hover {
+  background-color: #f1f2f3;
+}
+
+a.card-link:focus-visible,
+.popover-footer:focus-visible {
+  outline: 2px solid #23ade5;
+  outline-offset: -2px;
+}
+
+.cover {
+  position: relative;
+  width: 128px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f1f2f3;
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-time {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 12px;
+  line-height: 14px;
+  pointer-events: none;
+}
+
+.video-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; /* 允许长标题和作者名截断 */
+  height: 72px;
+}
+
+.video-info .title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: #18191c;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.author,
+.meta,
+.dead-meta {
+  font-size: 12px;
+  line-height: 16px;
+  color: #9499a0;
+}
+
+.author {
+  margin-top: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta .iconfont {
+  font-size: 12px;
+  color: inherit;
+}
+
+/* 失效视频沿用条目布局，只改变显示状态 */
+.dead-card {
+  cursor: not-allowed;
+}
+
+.dead-cover img {
+  filter: grayscale(1);
+  opacity: 0.7;
+}
+
+.dead-mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 12px;
+}
+
+.dead-card .title {
+  color: #9499a0;
+}
+
+.dead-meta {
+  margin-top: auto;
 }
 </style>
